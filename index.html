@@ -131,48 +131,49 @@
         });
 
 
-        // --- 3. إرسال النموذج للخادم (Backend) ---
-        signupForm.addEventListener('submit', function(event) {
-            // أولاً، نمنع الفورم من تحديث الصفحة
-            event.preventDefault();
+// --- 3. إرسال النموذج للخادم (Backend) ---
+    signupForm.addEventListener('submit', function(event) {
+        // أولاً، نمنع الفورم من تحديث الصفحة
+        event.preventDefault();
 
-            // ثانياً، نجمع البيانات من الحقول
-            const userData = {
-                username: usernameInput.value,
-                email: emailInput.value,
-                password: passwordInput.value
-            };
+        // ثانياً، نجمع البيانات من الحقول
+        const userData = {
+            username: usernameInput.value,
+            email: emailInput.value,
+            password: passwordInput.value
+        };
 
-            // !--- هام جداً ---!
-            // تأكد من استبدال الرابط التالي برابط Render.com الخاص بك
-const backendUrl = 'https://shashaflix.onrender.com/';
-// ...
-fetch(backendUrl, {https://shashaflix.onrender.com/})
-                method: 'POST', // نوع الطلب
-                headers: {
-                    'Content-Type': 'application/json' // نوع البيانات
-                },
-                body: JSON.stringify(userData) // تحويل البيانات إلى نص JSON
-            })
-            .then(response => {
-                // إذا لم تكن الاستجابة ناجحة (مثل خطأ 503)
-                if (!response.ok) {
-                    throw new Error('فشل الخادم في الاستجابة');
-                }
-                return response.json(); // قراءة الرد من الخادم
-            })
-            .then(data => {
-                console.log('الخادم رد:', data);
-                alert(data.message); // عرض رسالة "تم التسجيل بنجاح!"
-                modal.classList.remove('visible'); // إغلاق النافذة
-            })
-            .catch(error => {
-                // في حال فشل الاتصال بالخادم
-                console.error('خطأ في الاتصال بالخادم:', error);
-                alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
-            });
+        // !--- هذا هو السطر الذي قمنا بتصحيحه ---!
+        // تأكد أنه يحتوي على "/register" في النهاLية
+        const backendUrl = 'https://shashaflix.onrender.com/register';
+        
+        // ثالثاً، نرسل البيانات إلى الخادم
+        // !--- وهنا نستخدم المتغير "backendUrl" ---!
+        fetch(backendUrl, {
+            method: 'POST', // نوع الطلب
+            headers: {
+                'Content-Type': 'application/json' // نوع البيانات
+            },
+            body: JSON.stringify(userData) // تحويل البيانات إلى نص JSON
+        })
+        .then(response => {
+            // إذا لم تكن الاستجابة ناجحة (مثل خطأ 503)
+            if (!response.ok) {
+                throw new Error('فشل الخادم في الاستجابة');
+            }
+            return response.json(); // قراءة الرد من الخادم
+        })
+        .then(data => {
+            console.log('الخادم رد:', data);
+            alert(data.message); // عرض رسالة "تم التسجيل بنجاح!"
+            modal.classList.remove('visible'); // إغلاق النافذة
+        })
+        .catch(error => {
+            // في حال فشل الاتصال بالخادم
+            console.error('خطأ في الاتصال بالخادم:', error);
+            alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
         });
-
+    });
     </script>
 
 </body>
