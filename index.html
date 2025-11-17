@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الأفلام (تصميم جديد)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar-brand">
+            <h1>LOGO</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="#">الرئيسية</a>
+            <a href="#">مسلسلات</a>
+            <a href="#">أفلام</a>
+        </nav>
+        <div class="nav-account">
+            <button class="btn btn-secondary">تسجيل الدخول</button>
+            <button id="open-signup-btn" class="btn btn-primary">إنشاء حساب</button>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <h2>اسم العمل المميز</h2>
+            <p>وصف قصير للعمل المميز في عدة أسطر لجذب انتباه المشاهد...</p>
+            <button class="btn btn-primary">▶ تشغيل</button>
+            <button class="btn btn-secondary">مزيد من المعلومات</button>
+        </div>
+    </section>
+
+    <main class="content-rows">
+        <section class="category-row">
+            <h2>أكمل المشاهدة</h2>
+            <div class="row-posters">
+                <div class="poster-container progress-poster">
+                    <img src="https://via.placeholder.com/200x300?text=Poster1" alt="ملصق العمل">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+                <div class="poster-container progress-poster">
+                    <img src="https://via.placeholder.com/200x300?text=Poster2" alt="ملصق العمل">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="category-row">
+            <h2>الأكثر مشاهدة</h2>
+            <div class="row-posters">
+                <div class="poster-container">
+                    <img src="https://via.placeholder.com/200x300?text=Poster4" alt="ملصق العمل">
+                </div>
+            </div>
+        </section>
+        <section class="category-row">
+            <h2>أحدث الإضافات</h2>
+            <div class="row-posters">
+                <div class="poster-container">
+                    <img src="https://via.placeholder.com/200x300?text=Poster9" alt="ملصق العمل">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="signup-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-btn">&times;</button>
+            <h2>إنشاء حساب جديد</h2>
+            <form>
+                <div class="form-group">
+                    <label for="username">اسم المستخدم</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">كلمة المرور</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary modal-btn">إنشاء الحساب</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        // --- 1. تحديد العناصر (الأزرار والنافذة) ---
+        // (نبحث عن العناصر بعد تحميل الصفحة)
+        document.addEventListener('DOMContentLoaded', (event) => {
+            
+            const openBtn = document.getElementById('open-signup-btn');
+            const closeBtn = document.getElementById('close-modal-btn');
+            const modal = document.getElementById('signup-modal');
+            
+            const signupForm = document.querySelector('.modal-content form');
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            // --- 2. إظهار وإخفاء النافذة ---
+            if (openBtn) {
+                openBtn.addEventListener('click', function() {
+                    if (modal) modal.classList.add('visible');
+                });
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    if (modal) modal.classList.remove('visible');
+                });
+            }
+
+            if (modal) {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.classList.remove('visible');
+                    }
+                });
+            }
+
+            // --- 3. إرسال النموذج للخادم (Backend) ---
+            if (signupForm) {
+                signupForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // نمنع تحديث الصفحة
+
+                    const userData = {
+                        username: usernameInput.value,
+                        email: emailInput.value,
+                        password: passwordInput.value
+                    };
+
+                    // إرسال البيانات إلى الخادم
+                    fetch('https://shashaflix.onrender.com', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('الخادم رد:', data);
+                        alert(data.message); // عرض رسالة "تم التسجيل بنجاح!"
+                        if (modal) modal.classList.remove('visible'); // إغلاق النافذة
+                    })
+                    .catch(error => {
+                        console.error('خطأ في الاتصال بالخادم:', error);
+                        alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
