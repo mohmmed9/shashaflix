@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأفلام (تصميم جديد)</title>
+    <title>منصة الأفلام (التصميم الجديد)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header class="navbar">
         <div class="navbar-brand">
-            <h1>LOGO</h1>
+            <h1>SHASHAFLIX</h1>
         </div>
         <nav class="nav-links">
             <a href="#">الرئيسية</a>
@@ -33,6 +33,7 @@
     </section>
 
     <main class="content-rows">
+
         <section class="category-row">
             <h2>أكمل المشاهدة</h2>
             <div class="row-posters">
@@ -50,23 +51,33 @@
                 </div>
             </div>
         </section>
+
         <section class="category-row">
             <h2>الأكثر مشاهدة</h2>
             <div class="row-posters">
                 <div class="poster-container">
                     <img src="https://via.placeholder.com/200x300?text=Poster4" alt="ملصق العمل">
                 </div>
+                <div class="poster-container">
+                    <img src="https://via.placeholder.com/200x300?text=Poster5" alt="ملصق العمل">
+                </div>
             </div>
         </section>
+
         <section class="category-row">
             <h2>أحدث الإضافات</h2>
             <div class="row-posters">
                 <div class="poster-container">
                     <img src="https://via.placeholder.com/200x300?text=Poster9" alt="ملصق العمل">
                 </div>
+                <div class="poster-container">
+                    <img src="https://via.placeholder.com/200x300?text=Poster10" alt="ملصق العمل">
+                </div>
             </div>
         </section>
+
     </main>
+
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
@@ -93,71 +104,77 @@
 
     <script>
         // --- 1. تحديد العناصر (الأزرار والنافذة) ---
-        // (نبحث عن العناصر بعد تحميل الصفحة)
-        document.addEventListener('DOMContentLoaded', (event) => {
-            
-            const openBtn = document.getElementById('open-signup-btn');
-            const closeBtn = document.getElementById('close-modal-btn');
-            const modal = document.getElementById('signup-modal');
-            
-            const signupForm = document.querySelector('.modal-content form');
-            const usernameInput = document.getElementById('username');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
+        const openBtn = document.getElementById('open-signup-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const modal = document.getElementById('signup-modal');
+        
+        // --- (تحديد النموذج والحقول) ---
+        const signupForm = document.querySelector('.modal-content form');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
 
-            // --- 2. إظهار وإخفاء النافذة ---
-            if (openBtn) {
-                openBtn.addEventListener('click', function() {
-                    if (modal) modal.classList.add('visible');
-                });
-            }
 
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    if (modal) modal.classList.remove('visible');
-                });
-            }
+        // --- 2. إظهار وإخفاء النافذة ---
+        openBtn.addEventListener('click', function() {
+            modal.classList.add('visible');
+        });
 
-            if (modal) {
-                modal.addEventListener('click', function(event) {
-                    if (event.target === modal) {
-                        modal.classList.remove('visible');
-                    }
-                });
-            }
+        closeBtn.addEventListener('click', function() {
+            modal.classList.remove('visible');
+        });
 
-            // --- 3. إرسال النموذج للخادم (Backend) ---
-            if (signupForm) {
-                signupForm.addEventListener('submit', function(event) {
-                    event.preventDefault(); // نمنع تحديث الصفحة
-
-                    const userData = {
-                        username: usernameInput.value,
-                        email: emailInput.value,
-                        password: passwordInput.value
-                    };
-
-                    // إرسال البيانات إلى الخادم
-                    fetch('https://shashaflix.onrender.com', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(userData)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('الخادم رد:', data);
-                        alert(data.message); // عرض رسالة "تم التسجيل بنجاح!"
-                        if (modal) modal.classList.remove('visible'); // إغلاق النافذة
-                    })
-                    .catch(error => {
-                        console.error('خطأ في الاتصال بالخادم:', error);
-                        alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
-                    });
-                });
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.remove('visible');
             }
         });
+
+
+        // --- 3. إرسال النموذج للخادم (Backend) ---
+        signupForm.addEventListener('submit', function(event) {
+            // أولاً، نمنع الفورم من تحديث الصفحة
+            event.preventDefault();
+
+            // ثانياً، نجمع البيانات من الحقول
+            const userData = {
+                username: usernameInput.value,
+                email: emailInput.value,
+                password: passwordInput.value
+            };
+
+            // !--- هام جداً ---!
+            // تأكد من استبدال الرابط التالي برابط Render.com الخاص بك
+            const backendUrl = 'https://shashaflix.onrender.com/';
+            
+            // ثالثاً، نرسل البيانات إلى الخادم
+            fetch(backendUrl, {
+                method: 'POST', // نوع الطلب
+                headers: {
+                    'Content-Type': 'application/json' // نوع البيانات
+                },
+                body: JSON.stringify(userData) // تحويل البيانات إلى نص JSON
+            })
+            .then(response => {
+                // إذا لم تكن الاستجابة ناجحة (مثل خطأ 503)
+                if (!response.ok) {
+                    throw new Error('فشل الخادم في الاستجابة');
+                }
+                return response.json(); // قراءة الرد من الخادم
+            })
+            .then(data => {
+                console.log('الخادم رد:', data);
+                alert(data.message); // عرض رسالة "تم التسجيل بنجاح!"
+                modal.classList.remove('visible'); // إغلاق النافذة
+            })
+            .catch(error => {
+                // في حال فشل الاتصال بالخادم
+                console.error('خطأ في الاتصال بالخادم:', error);
+                alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
+            });
+        });
+
     </script>
+
 </body>
 </html>
