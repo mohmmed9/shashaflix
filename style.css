@@ -254,11 +254,11 @@ body {
 }
 /* === إضافات القائمة الجانبية وشريط البحث === */
 
-/* 1. زر القائمة (الخطوط الثلاثة الصفراء) */
+/* 1. زر القائمة (تم تعديله للأزرق) */
 .menu-toggle-btn {
     background: none;
     border: none;
-    color: #FFD700; /* اللون الأصفر كما في صورتك */
+    color: var(--primary-color); /* تم التغيير للأزرق (#00BFFF) */
     font-size: 35px;
     cursor: pointer;
     line-height: 1;
@@ -266,7 +266,6 @@ body {
     display: flex;
     align-items: center;
 }
-
 /* 2. شريط البحث */
 .search-container {
     flex-grow: 1;
