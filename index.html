@@ -9,18 +9,37 @@
 </head>
 <body>
 
+    <div id="mySidebar" class="sidebar">
+        <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
+        <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
+        <a href="#">🏠 الرئيسية</a>
+        <a href="#">🔥 الأكثر مشاهدة</a>
+        <a href="#">🎬 أفلام أجنبية</a>
+        <a href="#">📺 مسلسلات عربية</a>
+        <a href="#">⭐ اقتراحات لك</a>
+        <a href="#">📂 تصنيفات</a>
+    </div>
+
     <header class="navbar">
+        
+        <button class="menu-toggle-btn" onclick="toggleMenu()">
+            &#9776; </button>
+
         <div class="navbar-brand">
             <h1>SHASHAFLIX</h1>
         </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="بحث عن فيلم أو مسلسل...">
+        </div>
+
         <nav class="nav-links">
             <a href="#">الرئيسية</a>
-            <a href="#">مسلسلات</a>
             <a href="#">أفلام</a>
         </nav>
+
         <div class="nav-account">
-            <button class="btn btn-secondary">تسجيل الدخول</button>
-            <button id="open-signup-btn" class="btn btn-primary">إنشاء حساب</button>
+            <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
         </div>
     </header>
 
@@ -34,21 +53,16 @@
     </section>
 
     <main class="content-rows">
-
         <section class="category-row">
             <h2>أكمل المشاهدة</h2>
-            <div class="row-posters" id="continue-watching-row">
-                </div>
+            <div class="row-posters" id="continue-watching-row"></div>
         </section>
 
         <section class="category-row">
             <h2>الأكثر مشاهدة</h2>
-            <div class="row-posters" id="trending-row">
-                </div>
+            <div class="row-posters" id="trending-row"></div>
         </section>
-        
     </main>
-
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
@@ -56,79 +70,71 @@
             <h2>إنشاء حساب جديد</h2>
             <form>
                 <div class="form-group">
-                    <label for="username">اسم المستخدم</label>
-                    <input type="text" id="username" name="username" required>
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">البريد الإلكتروني</label>
-                    <input type="email" id="email" name="email" required>
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="email" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">كلمة المرور</label>
-                    <input type="password" id="password" name="password" required>
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" required>
                 </div>
                 <button type="submit" class="btn btn-primary modal-btn">إنشاء الحساب</button>
             </form>
         </div>
     </div>
 
-
     <script>
-        // --- 1. تحديد العناصر الأساسية ---
+        // 1. وظيفة فتح وإغلاق القائمة الجانبية
+        function toggleMenu() {
+            const sidebar = document.getElementById('mySidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // 2. المتغيرات الأساسية
         const openBtn = document.getElementById('open-signup-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         const modal = document.getElementById('signup-modal');
         const signupForm = document.querySelector('.modal-content form');
         
-        // !!! الرابط جاهز الآن، لا تحتاج لتعديله !!!
+        // !!! رابط السيرفر الخاص بك !!!
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         
-        // --- 2. وظيفة جلب الأعمال وعرضها ---
+        // 3. دالة جلب الأعمال
         async function renderWorks() {
-            // نحدد صف "الأكثر مشاهدة" ليظهر فيه المحتوى
             const rowPostersContainer = document.getElementById('trending-row'); 
-
             try {
-                // طلب البيانات من الخادم
                 const response = await fetch(`${renderBaseUrl}/api/works`);
-                if (!response.ok) {
-                    throw new Error(`Server returned status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Status: ${response.status}`);
                 const worksData = await response.json();
                 
-                // مسح أي محتوى قديم
                 rowPostersContainer.innerHTML = '';
 
-                // إذا كانت قاعدة البيانات فارغة
                 if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لم يتم إضافة أي عمل بعد.</p>';
+                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لا توجد أعمال حالياً.</p>';
                      return;
                 }
 
-                // بناء وعرض بطاقات الأفلام (مع ميزة النقر)
                 worksData.forEach(work => {
                     const posterHTML = `
                         <div class="poster-container" onclick="window.location.href='watch.html'" style="cursor: pointer;">
-                            <img src="${work.posterUrl || 'https://via.placeholder.com/200x300?text=No+Poster'}" alt="${work.title}">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 50%;"></div>
-                            </div>
+                            <img src="${work.posterUrl || 'https://via.placeholder.com/200x300'}" alt="${work.title}">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
                         </div>
                     `;
                     rowPostersContainer.innerHTML += posterHTML;
                 });
-
             } catch (error) {
-                console.error('Error fetching works:', error);
-                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال بالخادم... (قد يكون نائماً، انتظر قليلاً)</p>';
+                console.error('Error:', error);
+                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال بالسيرفر...</p>';
             }
         }
 
-
-        // --- 3. إرسال نموذج إنشاء الحساب ---
+        // 4. دالة التسجيل
         signupForm.addEventListener('submit', function(event) {
             event.preventDefault();
-
             const userData = {
                 username: document.getElementById('username').value,
                 email: document.getElementById('email').value,
@@ -140,29 +146,25 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData) 
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message || 'فشل التسجيل'); });
-                }
-                return response.json();
+            .then(res => {
+                if (!res.ok) return res.json().then(err => { throw new Error(err.message); });
+                return res.json();
             })
             .then(data => {
                 alert(data.message);
                 modal.classList.remove('visible'); 
             })
             .catch(error => {
-                console.error('خطأ في الاتصال:', error);
-                alert(`خطأ: ${error.message}. تأكد من أن الخادم يعمل.`);
+                alert(`خطأ: ${error.message}`);
             });
         });
 
-        // --- 4. تشغيل الوظائف عند التحميل ---
-        openBtn.addEventListener('click', function() { modal.classList.add('visible'); });
-        closeBtn.addEventListener('click', function() { modal.classList.remove('visible'); });
-        modal.addEventListener('click', function(event) { if (event.target === modal) { modal.classList.remove('visible'); } });
+        // تشغيل النوافذ والتحميل
+        openBtn.addEventListener('click', () => modal.classList.add('visible'));
+        closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
         
         renderWorks();
-
     </script>
 
 </body>
