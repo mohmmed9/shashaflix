@@ -27,10 +27,16 @@
             </div>
         </div>
 
-        <div class="search-container" style="display: none;"> <input type="text" class="search-input" placeholder="بحث...">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="بحث عن فيلم أو مسلسل...">
         </div>
 
-        <div class="nav-account" style="display: flex; gap: 10px;">
+        <nav class="nav-links">
+            <a href="#">الرئيسية</a>
+            <a href="#">أفلام</a>
+        </nav>
+
+        <div class="nav-account">
             <button class="btn btn-secondary" onclick="alert('سيتم تفعيل صفحة الدخول قريباً')">دخول</button>
             <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
         </div>
@@ -81,25 +87,22 @@
     </div>
 
     <script>
-        // 1. القائمة الجانبية
+        // وظيفة القائمة الجانبية
         function toggleMenu() {
             document.getElementById('mySidebar').classList.toggle('active');
         }
 
-        // 2. العناصر
         const openBtn = document.getElementById('open-signup-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         const modal = document.getElementById('signup-modal');
         const signupForm = document.querySelector('.modal-content form');
         
-        // رابط الخادم (Render)
+        // رابط الخادم 
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         
-        // 3. دالة جلب الأعمال (تم إعادتها للصف الأول)
+        // دالة جلب الأعمال وعرضها في صف "أكمل المشاهدة"
         async function renderWorks() {
-            // !--- تم التصحيح: العرض في صف "أكمل المشاهدة" ---!
             const rowPostersContainer = document.getElementById('continue-watching-row'); 
-
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
                 if (!response.ok) throw new Error(`Status: ${response.status}`);
@@ -108,7 +111,7 @@
                 rowPostersContainer.innerHTML = '';
 
                 if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لا توجد أعمال.</p>';
+                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">جاري تحميل الأعمال...</p>';
                      return;
                 }
 
@@ -123,11 +126,11 @@
                 });
             } catch (error) {
                 console.error('Error:', error);
-                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال...</p>';
+                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال بالسيرفر...</p>';
             }
         }
 
-        // 4. دالة التسجيل
+        // دالة التسجيل
         signupForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const userData = {
