@@ -12,14 +12,15 @@
     <div id="mySidebar" class="sidebar">
         <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
-        <a href="#">🏠 الرئيسية</a>
-        <a href="#">🔥 الأكثر مشاهدة</a>
-        <a href="#">🎬 أفلام</a>
-        <a href="#">📺 مسلسلات</a>
-        <a href="#">⭐ المفضلة</a>
+        <a href="#"> الرئيسية</a>
+        <a href="#" onclick="document.getElementById('login-modal').classList.add('visible'); toggleMenu()">👤 تسجيل الدخول</a>
+        <a href="#"> الأكثر مشاهدة</a>
+        <a href="#"> أفلام</a>
+        <a href="#"> مسلسلات</a>
     </div>
 
     <header class="navbar">
+        
         <div class="nav-left-section">
             <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
             <div class="navbar-brand">
@@ -37,18 +38,17 @@
         </nav>
 
         <div class="nav-account">
-            <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('login-modal').classList.add('visible')">دخول</button>
+            <button id="open-signup-btn" class="btn btn-primary">جديد</button>
         </div>
     </header>
 
     <section class="hero-section">
         <div class="hero-content">
-            
             <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img">
-            
-            <p>وصف قصير للعمل المميز في عدة أسطر لجذب انتباه المشاهد...</p>
+            <p>وصف قصير للعمل المميز...</p>
             <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
-            <button class="btn btn-secondary">مزيد من المعلومات</button>
+            <button class="btn btn-secondary" style="display:inline-block">معلومات</button>
         </div>
     </section>
 
@@ -57,7 +57,6 @@
             <h2>أكمل المشاهدة</h2>
             <div class="row-posters" id="continue-watching-row"></div>
         </section>
-
         <section class="category-row">
             <h2>الأكثر مشاهدة</h2>
             <div class="row-posters" id="trending-row"></div>
@@ -66,115 +65,73 @@
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
-            <button id="close-modal-btn" class="close-btn">&times;</button>
+            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
             <h2>إنشاء حساب جديد</h2>
-            <form>
-                <div class="form-group">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div class="form-group">
-                    <label>البريد الإلكتروني</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary modal-btn">إنشاء الحساب</button>
+            <form id="signup-form">
+                <div class="form-group"><label>الاسم</label><input type="text" id="username" required></div>
+                <div class="form-group"><label>الإيميل</label><input type="email" id="email" required></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" id="password" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">إنشاء</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
+            <h2>تسجيل الدخول</h2>
+            <form id="login-form"> <div class="form-group"><label>الإيميل</label><input type="email" required></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">دخول</button>
             </form>
         </div>
     </div>
 
     <script>
-        // 1. وظائف القائمة الجانبية
-        function toggleMenu() {
-            document.getElementById('mySidebar').classList.toggle('active');
-        }
-
-        const openBtn = document.getElementById('open-signup-btn');
-        const closeBtn = document.getElementById('close-modal-btn');
-        const modal = document.getElementById('signup-modal');
-        const signupForm = document.querySelector('.modal-content form');
+        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
         
-        // رابط السيرفر الخاص بك (تم وضعه)
         const renderBaseUrl = 'https://shashaflix.onrender.com';
-        
-        // 2. دالة جلب وعرض الأعمال
+
         async function renderWorks() {
-            const rowPostersContainer = document.getElementById('trending-row'); 
+            const row = document.getElementById('trending-row'); 
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
-                if (!response.ok) throw new Error(`Status: ${response.status}`);
-                const worksData = await response.json();
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                row.innerHTML = '';
+                if (data.length === 0) { row.innerHTML = '<p style="color:#fff;padding:20px">لا توجد أعمال.</p>'; return; }
                 
-                rowPostersContainer.innerHTML = '';
-
-                if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لم يتم إضافة أعمال بعد.</p>';
-                     return;
-                }
-
-                worksData.forEach(work => {
-                    // عند الضغط نرسل ID العمل في الرابط
-                    const posterHTML = `
+                data.forEach(work => {
+                    row.innerHTML += `
                         <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
-                            <img src="${work.posterUrl || 'https://via.placeholder.com/200x300'}" alt="${work.title}">
-                            <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
-                        </div>
-                    `;
-                    rowPostersContainer.innerHTML += posterHTML;
+                            <img src="${work.posterUrl}" alt="${work.title}">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div>
+                        </div>`;
                 });
-            } catch (error) {
-                console.error('Error:', error);
-                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال بالسيرفر...</p>';
-            }
+            } catch (e) { row.innerHTML = '<p style="color:red;padding:20px">خطأ في الاتصال</p>'; }
         }
 
-        // 3. دالة التسجيل
-        signupForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+        // تفعيل زر إنشاء حساب
+        document.getElementById('open-signup-btn').onclick = () => document.getElementById('signup-modal').classList.add('visible');
+        
+        // ربط نموذج التسجيل
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             const userData = {
                 username: document.getElementById('username').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
-
             fetch(`${renderBaseUrl}/register`, {
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData) 
-            })
-            .then(res => {
-                if (!res.ok) return res.json().then(err => { throw new Error(err.message); });
-                return res.json();
-            })
-            .then(data => {
-                alert(data.message);
-                modal.classList.remove('visible'); 
-            })
-            .catch(error => {
-                alert(`خطأ: ${error.message}`);
-            });
+                method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(userData)
+            }).then(r => r.json()).then(d => { alert(d.message); document.getElementById('signup-modal').classList.remove('visible'); })
+              .catch(err => alert('فشل الاتصال'));
         });
-
-        // 4. إدارة النوافذ
-        openBtn.addEventListener('click', () => modal.classList.add('visible'));
-        closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
         
-        // 5. كود تفعيل PWA (Service Worker)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
-            });
-        }
+        // كود PWA
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js'); }
 
-        // تشغيل العرض
         renderWorks();
     </script>
-
 </body>
 </html>
