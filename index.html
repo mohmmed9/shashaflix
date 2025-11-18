@@ -14,23 +14,20 @@
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
         <a href="#">🏠 الرئيسية</a>
         <a href="#">🔥 الأكثر مشاهدة</a>
-        <a href="#">🎬 أفلام أجنبية</a>
-        <a href="#">📺 مسلسلات عربية</a>
-        <a href="#">⭐ اقتراحات لك</a>
-        <a href="#">📂 تصنيفات</a>
+        <a href="#">🎬 أفلام</a>
+        <a href="#">📺 مسلسلات</a>
     </div>
 
     <header class="navbar">
-        
-        <button class="menu-toggle-btn" onclick="toggleMenu()">
-            &#9776; </button>
-
-        <div class="navbar-brand">
-            <h1>SHASHAFLIX</h1>
+        <div class="nav-left-section">
+            <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
+            <div class="navbar-brand">
+                <h1>SHASHAFLIX</h1>
+            </div>
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="بحث عن فيلم أو مسلسل...">
+            <input type="text" class="search-input" placeholder="بحث...">
         </div>
 
         <nav class="nav-links">
@@ -87,23 +84,22 @@
     </div>
 
     <script>
-        // 1. وظيفة فتح وإغلاق القائمة الجانبية
+        // وظيفة القائمة الجانبية
         function toggleMenu() {
-            const sidebar = document.getElementById('mySidebar');
-            sidebar.classList.toggle('active');
+            document.getElementById('mySidebar').classList.toggle('active');
         }
 
-        // 2. المتغيرات الأساسية
         const openBtn = document.getElementById('open-signup-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         const modal = document.getElementById('signup-modal');
         const signupForm = document.querySelector('.modal-content form');
         
-        // !!! رابط السيرفر الخاص بك !!!
+        // رابط السيرفر الصحيح
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         
-        // 3. دالة جلب الأعمال
+        // دالة جلب وعرض الأعمال
         async function renderWorks() {
+            // نحدد صف الأكثر مشاهدة
             const rowPostersContainer = document.getElementById('trending-row'); 
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
@@ -113,13 +109,13 @@
                 rowPostersContainer.innerHTML = '';
 
                 if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لا توجد أعمال حالياً.</p>';
+                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">قائمة فارغة.</p>';
                      return;
                 }
 
                 worksData.forEach(work => {
                     const posterHTML = `
-                        <div class="poster-container" onclick="window.location.href='watch.html'" style="cursor: pointer;">
+                        <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
                             <img src="${work.posterUrl || 'https://via.placeholder.com/200x300'}" alt="${work.title}">
                             <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
                         </div>
@@ -132,7 +128,7 @@
             }
         }
 
-        // 4. دالة التسجيل
+        // دالة التسجيل
         signupForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const userData = {
@@ -159,7 +155,7 @@
             });
         });
 
-        // تشغيل النوافذ والتحميل
+        // إدارة النوافذ
         openBtn.addEventListener('click', () => modal.classList.add('visible'));
         closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
