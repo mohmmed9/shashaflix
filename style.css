@@ -252,3 +252,108 @@ body {
     padding: 12px;
     font-size: 16px;
 }
+/* === إضافات القائمة الجانبية وشريط البحث === */
+
+/* 1. زر القائمة (الخطوط الثلاثة الصفراء) */
+.menu-toggle-btn {
+    background: none;
+    border: none;
+    color: #FFD700; /* اللون الأصفر كما في صورتك */
+    font-size: 35px;
+    cursor: pointer;
+    line-height: 1;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+
+/* 2. شريط البحث */
+.search-container {
+    flex-grow: 1;
+    max-width: 400px;
+    margin: 0 20px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    background-color: #1f1f1f;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    background-color: #2a2a2a;
+}
+
+/* 3. القائمة الجانبية (Sidebar) */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px; /* مخفية في البداية */
+    width: 250px;
+    height: 100%;
+    background-color: #141414;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.8);
+    z-index: 1001; /* فوق كل شيء */
+    padding-top: 60px;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    right: 0; /* تظهر عند التفعيل */
+}
+
+.sidebar a {
+    padding: 15px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #e0e0e0;
+    border-bottom: 1px solid #333;
+    transition: 0.2s;
+    display: block;
+}
+
+.sidebar a:hover {
+    background-color: #1f1f1f;
+    color: var(--primary-color);
+    padding-right: 35px; /* حركة بسيطة عند التحويم */
+}
+
+.close-sidebar-btn {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* تعديل الشريط العلوي لاستيعاب العناصر الجديدة */
+.navbar {
+    justify-content: flex-start; /* ترتيب العناصر من البداية */
+    gap: 10px;
+}
+
+.navbar-brand {
+    margin-left: auto; /* دفع الشعار لليسار قليلاً */
+}
+
+/* إخفاء الروابط القديمة في الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; /* نخفي الروابط العادية ونعتمد على القائمة الجانبية */
+    }
+    .search-container {
+        max-width: 150px; /* تصغير البحث في الموبايل */
+    }
+}
