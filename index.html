@@ -74,19 +74,19 @@
 
 
     <script>
-        // --- 1. تحديد العناصر الأساسية وURL الخادم ---
+        // --- 1. تحديد العناصر الأساسية ---
         const openBtn = document.getElementById('open-signup-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         const modal = document.getElementById('signup-modal');
         const signupForm = document.querySelector('.modal-content form');
         
-        // !!! هام: يجب استبدال هذا برابط Render.com الخاص بك !!!
+        // !!! تم وضع رابط الخادم الخاص بك هنا !!!
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         
-        // --- 2. وظيفة جلب الأعمال وعرضها (العرض الديناميكي) ---
+        // --- 2. وظيفة جلب الأعمال وعرضها ---
         async function renderWorks() {
-            // نحدد الصف الأول للعرض
-            const rowPostersContainer = document.getElementById('continue-watching-row'); 
+            // !! التعديل هنا: نحدد صف "الأكثر مشاهدة" كهدف للعرض !!
+            const rowPostersContainer = document.getElementById('trending-row'); 
 
             try {
                 // طلب البيانات من الخادم (مسار /api/works)
@@ -101,7 +101,8 @@
 
                 // إذا كانت قاعدة البيانات فارغة
                 if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لم يتم إضافة أي عمل بعد. الرجاء إضافة عمل في Firebase.</p>';
+                     // رسالة تظهر فقط إذا لم تكن هناك أفلام
+                     // rowPostersContainer.innerHTML = '<p style="color:gray; margin: 20px;">قريباً...</p>';
                      return;
                 }
 
@@ -110,17 +111,14 @@
                     const posterHTML = `
                         <div class="poster-container">
                             <img src="${work.posterUrl || 'https://via.placeholder.com/200x300?text=No+Poster'}" alt="${work.title}">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 50%;"></div>
-                            </div>
-                        </div>
+                            <div class="progress-bar" style="display:none;"></div> </div>
                     `;
                     rowPostersContainer.innerHTML += posterHTML;
                 });
 
             } catch (error) {
-                console.error('Error fetching and rendering works:', error);
-                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">فشل الاتصال بالخادم. (تأكد من رابط الخادم وتنشيطه).</p>';
+                console.error('Error fetching works:', error);
+                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">فشل الاتصال بالخادم.</p>';
             }
         }
 
@@ -152,7 +150,7 @@
                 modal.classList.remove('visible'); 
             })
             .catch(error => {
-                console.error('خطأ في الاتصال بالخادم:', error);
+                console.error('خطأ في الاتصال:', error);
                 alert(`خطأ: ${error.message}. تأكد من الاتصال بالخادم.`);
             });
         });
@@ -163,7 +161,7 @@
         closeBtn.addEventListener('click', function() { modal.classList.remove('visible'); });
         modal.addEventListener('click', function(event) { if (event.target === modal) { modal.classList.remove('visible'); } });
         
-        // تشغيل وظيفة جلب وعرض الأعمال عند تحميل الصفحة
+        // تشغيل وظيفة جلب الأعمال
         renderWorks();
 
     </script>
