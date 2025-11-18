@@ -16,28 +16,19 @@
         <a href="#">🔥 الأكثر مشاهدة</a>
         <a href="#">🎬 أفلام</a>
         <a href="#">📺 مسلسلات</a>
-        <a href="#" onclick="alert('صفحة تسجيل الدخول قريباً')">🔑 تسجيل الدخول</a>
+        <a href="#">⭐ المفضلة</a>
     </div>
 
     <header class="navbar">
         <div class="nav-left-section">
             <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
             <div class="navbar-brand">
-                <section class="hero-section">
-        <div class="hero-content">
-            
-            <img src="hero-logo.png" alt="عنوان العمل" class="hero-logo-img">
-            
-            <p>وصف قصير للعمل المميز في عدة أسطر لجذب انتباه المشاهد...</p>
-            <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
-            <button class="btn btn-secondary">مزيد من المعلومات</button>
-        </div>
-    </section>
+                <h1>SHASHAFLIX</h1>
             </div>
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="بحث عن فيلم أو مسلسل...">
+            <input type="text" class="search-input" placeholder="بحث...">
         </div>
 
         <nav class="nav-links">
@@ -46,14 +37,15 @@
         </nav>
 
         <div class="nav-account">
-            <button class="btn btn-secondary" onclick="alert('سيتم تفعيل صفحة الدخول قريباً')">دخول</button>
             <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
         </div>
     </header>
 
     <section class="hero-section">
         <div class="hero-content">
-            <h2>اسم العمل المميز</h2>
+            
+            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img">
+            
             <p>وصف قصير للعمل المميز في عدة أسطر لجذب انتباه المشاهد...</p>
             <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
             <button class="btn btn-secondary">مزيد من المعلومات</button>
@@ -63,8 +55,7 @@
     <main class="content-rows">
         <section class="category-row">
             <h2>أكمل المشاهدة</h2>
-            <div class="row-posters" id="continue-watching-row">
-                </div>
+            <div class="row-posters" id="continue-watching-row"></div>
         </section>
 
         <section class="category-row">
@@ -96,7 +87,7 @@
     </div>
 
     <script>
-        // وظيفة القائمة الجانبية
+        // 1. وظائف القائمة الجانبية
         function toggleMenu() {
             document.getElementById('mySidebar').classList.toggle('active');
         }
@@ -106,12 +97,12 @@
         const modal = document.getElementById('signup-modal');
         const signupForm = document.querySelector('.modal-content form');
         
-        // رابط الخادم 
+        // رابط السيرفر الخاص بك (تم وضعه)
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         
-        // دالة جلب الأعمال وعرضها في صف "أكمل المشاهدة"
+        // 2. دالة جلب وعرض الأعمال
         async function renderWorks() {
-            const rowPostersContainer = document.getElementById('continue-watching-row'); 
+            const rowPostersContainer = document.getElementById('trending-row'); 
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
                 if (!response.ok) throw new Error(`Status: ${response.status}`);
@@ -120,13 +111,14 @@
                 rowPostersContainer.innerHTML = '';
 
                 if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">جاري تحميل الأعمال...</p>';
+                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لم يتم إضافة أعمال بعد.</p>';
                      return;
                 }
 
                 worksData.forEach(work => {
+                    // عند الضغط نرسل ID العمل في الرابط
                     const posterHTML = `
-                        <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'" style="cursor: pointer;">
+                        <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
                             <img src="${work.posterUrl || 'https://via.placeholder.com/200x300'}" alt="${work.title}">
                             <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
                         </div>
@@ -139,7 +131,7 @@
             }
         }
 
-        // دالة التسجيل
+        // 3. دالة التسجيل
         signupForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const userData = {
@@ -166,18 +158,21 @@
             });
         });
 
-        // تشغيل النوافذ والتحميل
+        // 4. إدارة النوافذ
         openBtn.addEventListener('click', () => modal.classList.add('visible'));
         closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
         
-        // تفعيل PWA
+        // 5. كود تفعيل PWA (Service Worker)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js').catch(err => console.log('SW Failed', err));
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Failed', err));
             });
         }
-        
+
+        // تشغيل العرض
         renderWorks();
     </script>
 
