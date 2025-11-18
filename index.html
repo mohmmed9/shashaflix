@@ -6,30 +6,30 @@
     <title>منصة الأفلام (SHASHAFLIX)</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" type="image/png">
 </head>
 <body>
 
     <div id="mySidebar" class="sidebar">
         <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
-        <a href="#">🏠 الرئيسية</a>
-        <a href="#">🔥 الأكثر مشاهدة</a>
-        <a href="#">🎬 أفلام</a>
-        <a href="#">📺 مسلسلات</a>
+        <a href="https://shashaflix.vercel.app/index.html#"> الرئيسية</a>
+        <a href="#"> الأكثر مشاهدة</a>
+        <a href="#"> أفلام</a>
+        <a href="#"> مسلسلات</a>
+        <a href="#"> مفضلة</a>
     </div>
 
-<header class="navbar">
+    <header class="navbar">
         <div class="nav-left-section">
             <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
             <div class="navbar-brand">
-<div class="navbar-brand">
-            <img src="logo.png" alt="SHASHAFLIX" class="logo-img">
-        </div>
+                <h1>SHASHAFLIX</h1>
             </div>
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="بحث...">
+            <input type="text" class="search-input" placeholder="بحث عن فيلم أو مسلسل...">
         </div>
 
         <nav class="nav-links">
@@ -37,11 +37,11 @@
             <a href="#">أفلام</a>
         </nav>
 
-        <div class="nav-account" style="display: flex; gap: 10px;">
-            <button class="btn btn-secondary">دخول</button>
+        <div class="nav-account">
             <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
         </div>
     </header>
+
     <section class="hero-section">
         <div class="hero-content">
             <h2>اسم العمل المميز</h2>
@@ -68,102 +68,3 @@
             <button id="close-modal-btn" class="close-btn">&times;</button>
             <h2>إنشاء حساب جديد</h2>
             <form>
-                <div class="form-group">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div class="form-group">
-                    <label>البريد الإلكتروني</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary modal-btn">إنشاء الحساب</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // وظيفة القائمة الجانبية
-        function toggleMenu() {
-            document.getElementById('mySidebar').classList.toggle('active');
-        }
-
-        const openBtn = document.getElementById('open-signup-btn');
-        const closeBtn = document.getElementById('close-modal-btn');
-        const modal = document.getElementById('signup-modal');
-        const signupForm = document.querySelector('.modal-content form');
-        
-        // رابط السيرفر الصحيح
-        const renderBaseUrl = 'https://shashaflix.onrender.com';
-        
-        // دالة جلب وعرض الأعمال
-        async function renderWorks() {
-            // نحدد صف الأكثر مشاهدة
-            const rowPostersContainer = document.getElementById('trending-row'); 
-            try {
-                const response = await fetch(`${renderBaseUrl}/api/works`);
-                if (!response.ok) throw new Error(`Status: ${response.status}`);
-                const worksData = await response.json();
-                
-                rowPostersContainer.innerHTML = '';
-
-                if (worksData.length === 0) {
-                     rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">قائمة فارغة.</p>';
-                     return;
-                }
-
-                worksData.forEach(work => {
-                    const posterHTML = `
-                        <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
-                            <img src="${work.posterUrl || 'https://via.placeholder.com/200x300'}" alt="${work.title}">
-                            <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
-                        </div>
-                    `;
-                    rowPostersContainer.innerHTML += posterHTML;
-                });
-            } catch (error) {
-                console.error('Error:', error);
-                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال بالسيرفر...</p>';
-            }
-        }
-
-        // دالة التسجيل
-        signupForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const userData = {
-                username: document.getElementById('username').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            };
-
-            fetch(`${renderBaseUrl}/register`, {
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData) 
-            })
-            .then(res => {
-                if (!res.ok) return res.json().then(err => { throw new Error(err.message); });
-                return res.json();
-            })
-            .then(data => {
-                alert(data.message);
-                modal.classList.remove('visible'); 
-            })
-            .catch(error => {
-                alert(`خطأ: ${error.message}`);
-            });
-        });
-
-        // إدارة النوافذ
-        openBtn.addEventListener('click', () => modal.classList.add('visible'));
-        closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
-        
-        renderWorks();
-    </script>
-
-</body>
-</html>

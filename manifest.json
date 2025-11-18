@@ -1,0 +1,21 @@
+{
+  "name": "SHASHAFLIX",
+  "short_name": "SHASHAFLIX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#00BFFF",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2503/2503508.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://download1580.mediafire.com/sfcgpq5wk9ogQ1OqTMdVcXFgquxhcYRUpwLjy8_dfZkem4CZ1lE5L6OYyzFN8dGzXusgzGECXKhjZjVoY1geOb-8FoqKeMt_odYRRqSotmiqOA4YBrJGSQts2Wk0O2mj291oEz6eRk6ccZT0o56sSoZRCUUShtlybGBMQh3_EE9q/y5u5ev71l8ggia0/1763447866860.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
