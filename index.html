@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأفلام (التصميم الجديد)</title>
+    <title>منصة الأفلام (SHASHAFLIX)</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -36,46 +37,16 @@
 
         <section class="category-row">
             <h2>أكمل المشاهدة</h2>
-            <div class="row-posters">
-                <div class="poster-container progress-poster">
-                    <img src="https://via.placeholder.com/200x300?text=Poster1" alt="ملصق العمل">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 75%;"></div>
-                    </div>
+            <div class="row-posters" id="continue-watching-row">
                 </div>
-                <div class="poster-container progress-poster">
-                    <img src="https://via.placeholder.com/200x300?text=Poster2" alt="ملصق العمل">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 30%;"></div>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section class="category-row">
             <h2>الأكثر مشاهدة</h2>
-            <div class="row-posters">
-                <div class="poster-container">
-                    <img src="https://via.placeholder.com/200x300?text=Poster4" alt="ملصق العمل">
+            <div class="row-posters" id="trending-row">
                 </div>
-                <div class="poster-container">
-                    <img src="https://via.placeholder.com/200x300?text=Poster5" alt="ملصق العمل">
-                </div>
-            </div>
         </section>
-
-        <section class="category-row">
-            <h2>أحدث الإضافات</h2>
-            <div class="row-posters">
-                <div class="poster-container">
-                    <img src="https://via.placeholder.com/200x300?text=Poster9" alt="ملصق العمل">
-                </div>
-                <div class="poster-container">
-                    <img src="https://via.placeholder.com/200x300?text=Poster10" alt="ملصق العمل">
-                </div>
-            </div>
-        </section>
-
+        
     </main>
 
 
@@ -103,77 +74,89 @@
 
 
     <script>
-        // --- 1. تحديد العناصر (الأزرار والنافذة) ---
+        // --- 1. تحديد العناصر الأساسية وURL الخادم ---
         const openBtn = document.getElementById('open-signup-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         const modal = document.getElementById('signup-modal');
-        
-        // --- (تحديد النموذج والحقول) ---
         const signupForm = document.querySelector('.modal-content form');
-        const usernameInput = document.getElementById('username');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-
-
-        // --- 2. إظهار وإخفاء النافذة ---
-        openBtn.addEventListener('click', function() {
-            modal.classList.add('visible');
-        });
-
-        closeBtn.addEventListener('click', function() {
-            modal.classList.remove('visible');
-        });
-
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                modal.classList.remove('visible');
-            }
-        });
-
-
-// --- 3. إرسال النموذج للخادم (Backend) ---
-    signupForm.addEventListener('submit', function(event) {
-        // أولاً، نمنع الفورم من تحديث الصفحة
-        event.preventDefault();
-
-        // ثانياً، نجمع البيانات من الحقول
-        const userData = {
-            username: usernameInput.value,
-            email: emailInput.value,
-            password: passwordInput.value
-        };
-
-        // !--- هذا هو السطر الذي قمنا بتصحيحه ---!
-        // تأكد أنه يحتوي على "/register" في النهاLية
-        const backendUrl = 'https://shashaflix.onrender.com/register';
         
-        // ثالثاً، نرسل البيانات إلى الخادم
-        // !--- وهنا نستخدم المتغير "backendUrl" ---!
-        fetch(backendUrl, {
-            method: 'POST', // نوع الطلب
-            headers: {
-                'Content-Type': 'application/json' // نوع البيانات
-            },
-            body: JSON.stringify(userData) // تحويل البيانات إلى نص JSON
-        })
-        .then(response => {
-            // إذا لم تكن الاستجابة ناجحة (مثل خطأ 503)
-            if (!response.ok) {
-                throw new Error('فشل الخادم في الاستجابة');
+        // !!! هام: يجب استبدال هذا برابط Render.com الخاص بك !!!
+        const renderBaseUrl = 'https://[YOUR-RENDER-URL-HERE].onrender.com';
+        
+        // --- 2. وظيفة جلب الأعمال وعرضها (العرض الديناميكي) ---
+        async function renderWorks() {
+            // هنا نحدد الصف الذي سيستقبل البيانات (الصف الأول: أكمل المشاهدة)
+            const rowPostersContainer = document.getElementById('continue-watching-row'); 
+
+            try {
+                // طلب البيانات من الخادم (مسار /api/works)
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                const worksData = await response.json();
+                
+                // مسح أي محتوى قديم (مثل الصور الثابتة التي كانت موجودة سابقاً)
+                rowPostersContainer.innerHTML = '';
+
+                // بناء وعرض بطاقات الأفلام
+                worksData.forEach(work => {
+                    const posterHTML = `
+                        <div class="poster-container">
+                            <img src="${work.posterUrl || 'https://via.placeholder.com/200x300?text=No+Poster'}" alt="${work.title}">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    `;
+                    rowPostersContainer.innerHTML += posterHTML;
+                });
+
+            } catch (error) {
+                console.error('Error fetching and rendering works:', error);
+                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">فشل جلب الأعمال من الخادم. (تأكد أن الخادم يعمل والقواعد مفتوحة).</p>';
             }
-            return response.json(); // قراءة الرد من الخادم
-        })
-        .then(data => {
-            console.log('الخادم رد:', data);
-            alert(data.message); // عرض رسالة "تم التسجيل بنجاح!"
-            modal.classList.remove('visible'); // إغلاق النافذة
-        })
-        .catch(error => {
-            // في حال فشل الاتصال بالخادم
-            console.error('خطأ في الاتصال بالخادم:', error);
-            alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
+        }
+
+
+        // --- 3. إرسال نموذج إنشاء الحساب (التسجيل) ---
+        signupForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const userData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            // إرسال البيانات إلى الخادم (مسار /register)
+            fetch(`${renderBaseUrl}/register`, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData) 
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('فشل الخادم في الاستجابة');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                modal.classList.remove('visible'); 
+            })
+            .catch(error => {
+                console.error('خطأ في الاتصال بالخادم:', error);
+                alert('حدث خطأ، لا يمكن الاتصال بالخادم. تأكد أنه يعمل.');
+            });
         });
-    });
+
+        // --- 4. تشغيل الوظائف عند تحميل الصفحة ---
+        // إظهار وإخفاء النافذة 
+        openBtn.addEventListener('click', function() { modal.classList.add('visible'); });
+        closeBtn.addEventListener('click', function() { modal.classList.remove('visible'); });
+        modal.addEventListener('click', function(event) { if (event.target === modal) { modal.classList.remove('visible'); } });
+        
+        // تشغيل وظيفة جلب وعرض الأعمال عند تحميل الصفحة
+        renderWorks();
+
     </script>
 
 </body>
