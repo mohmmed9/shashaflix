@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشاهدة المسلسل - SHASHAFLIX</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* === تنسيقات خاصة بصفحة المسلسلات === */
+        body {
+            overflow-x: hidden; /* منع التمرير الجانبي */
+        }
+
+        .watch-container {
+            display: flex;
+            flex-wrap: wrap; /* لتكون متجاوبة مع الموبايل */
+            height: calc(100vh - 70px); /* ارتفاع الشاشة ناقص الشريط العلوي */
+            padding-top: 70px;
+        }
+
+        /* --- 1. قسم الفيديو (يمين/أعلى) --- */
+        .video-section {
+            flex: 3; /* يأخذ مساحة أكبر */
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* --- 2. قسم الحلقات (يسار/أسفل) --- */
+        .episodes-section {
+            flex: 1; /* يأخذ مساحة أصغر */
+            background-color: #1f1f1f;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #333;
+            min-width: 300px;
+        }
+
+        .season-selector {
+            padding: 20px;
+            background-color: #141414;
+            border-bottom: 1px solid #333;
+        }
+
+        .season-selector select {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* قائمة الحلقات */
+        .episodes-list {
+            flex-grow: 1;
+            overflow-y: auto; /* لجعل القائمة قابلة للتمرير */
+            padding: 10px;
+        }
+
+        /* شكل الحلقة الواحدة */
+        .episode-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .episode-item:hover {
+            background-color: #333;
+        }
+
+        .episode-item.active {
+            background-color: #00BFFF; /* لون الحلقة التي تعمل حالياً */
+            color: black;
+        }
+
+        .episode-thumb {
+            width: 80px;
+            height: 45px;
+            background-color: #000;
+            margin-left: 10px;
+            border-radius: 3px;
+            object-fit: cover;
+        }
+
+        .episode-info h4 {
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        .episode-info span {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* للتجاوب مع الموبايل */
+        @media (max-width: 768px) {
+            .watch-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .video-section {
+                height: 50vh; /* الفيديو يأخذ نصف الشاشة */
+            }
+            .episodes-section {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar-brand"><h1>SHASHAFLIX</h1></div>
+        <div class="nav-account">
+            <a href="index.html" class="btn btn-secondary">➜ خروج</a>
+        </div>
+    </header>
+
+    <div class="watch-container">
+        
+        <div class="video-section">
+            <iframe id="main-player" class="video-player" 
+                src="" 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="episodes-section">
+            
+            <div class="season-selector">
+                <label style="color:#ccc; display:block; margin-bottom:5px;">اختر الموسم:</label>
+                <select id="season-select" onchange="loadEpisodes(this.value)">
+                    <option value="1">الموسم 1</option>
+                    <option value="2">الموسم 2</option>
+                    <option value="3">الموسم 3</option>
+                </select>
+            </div>
+
+            <div class="episodes-list" id="episodes-container">
+                </div>
+
+        </div>
+    </div>
+
+    <script>
+        // === بيانات الحلقات (يمكنك تعديل الروابط لاحقاً) ===
+        const seriesData = {
+            "1": [ // حلقات الموسم الأول
+                { title: "الحلقة 1: البداية", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", img: "https://via.placeholder.com/80x45?text=EP1" },
+                { title: "الحلقة 2: الغموض", url: "https://www.youtube.com/embed/tgbNymZ7vqY", img: "https://via.placeholder.com/80x45?text=EP2" },
+                { title: "الحلقة 3: المواجهة", url: "https://www.youtube.com/embed/VIDEO_ID_HERE", img: "https://via.placeholder.com/80x45?text=EP3" },
+            ],
+            "2": [ // حلقات الموسم الثاني
+                { title: "الحلقة 1: عودة البطل", url: "https://www.youtube.com/embed/VIDEO_ID_HERE", img: "https://via.placeholder.com/80x45?text=S2-EP1" },
+                { title: "الحلقة 2: الخيانة", url: "https://www.youtube.com/embed/VIDEO_ID_HERE", img: "https://via.placeholder.com/80x45?text=S2-EP2" },
+            ],
+            "3": [ // حلقات الموسم الثالث
+                { title: "الحلقة 1: النهاية", url: "https://www.youtube.com/embed/VIDEO_ID_HERE", img: "https://via.placeholder.com/80x45?text=S3-EP1" },
+            ]
+        };
+
+        const player = document.getElementById('main-player');
+        const container = document.getElementById('episodes-container');
+
+        // دالة لتغيير الفيديو عند الضغط
+        function playEpisode(url, element) {
+            player.src = url + "?autoplay=1"; // تشغيل تلقائي
+            
+            // تغيير لون الحلقة النشطة
+            document.querySelectorAll('.episode-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // دالة لعرض حلقات الموسم المختار
+        function loadEpisodes(seasonIndex) {
+            container.innerHTML = ""; // مسح القائمة القديمة
+            const episodes = seriesData[seasonIndex];
+
+            if(episodes) {
+                episodes.forEach((ep, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'episode-item';
+                    div.onclick = () => playEpisode(ep.url, div);
+                    
+                    div.innerHTML = `
+                        <img src="${ep.img}" class="episode-thumb">
+                        <div class="episode-info">
+                            <h4>${ep.title}</h4>
+                            <span>مدة العرض: 45د</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                
+                // تشغيل الحلقة الأولى تلقائياً عند تغيير الموسم
+                if(episodes.length > 0) {
+                    playEpisode(episodes[0].url, container.firstChild);
+                }
+            } else {
+                container.innerHTML = "<p style='color:gray; text-align:center; margin-top:20px;'>لا توجد حلقات</p>";
+            }
+        }
+
+        // تشغيل الموسم الأول عند فتح الصفحة
+        loadEpisodes("1");
+
+    </script>
+
+</body>
+</html>
