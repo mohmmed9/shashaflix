@@ -1,7 +1,6 @@
-/* --- استيراد خط جديد --- */
+/* === إعدادات الخطوط والألوان === */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-/* --- المتغيرات --- */
 :root {
     --primary-color: #00BFFF; /* أزرق سماوي */
     --background-color: #121212;
@@ -10,77 +9,136 @@
     --text-color-secondary: #e0e0e0;
 }
 
-/* --- إعدادات أساسية محدثة --- */
 body {
     background-color: var(--background-color);
     color: var(--text-color);
     font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     padding: 0;
+    overflow-x: hidden; /* منع التمرير العرضي */
 }
 
-/* 1. الشريط العلوي */
+/* === 1. الشريط العلوي (مُصلح بالكامل) === */
 .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px 50px;
-    background-color: var(--background-color);
+    justify-content: space-between; /* توزيع العناصر بانتظام */
+    padding: 10px 20px;
+    background-color: #141414;
     position: fixed;
     width: 100%;
     top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box; /* يمنع العناصر من الخروج عن الحدود */
+}
+
+/* تجميع الشعار وزر القائمة */
+.nav-left-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
 }
 
 .navbar-brand h1 {
     color: var(--primary-color);
     margin: 0;
-    font-size: 28px;
+    font-size: 24px;
+}
+
+/* زر القائمة الجانبية */
+.menu-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* شريط البحث */
+.search-container {
+    flex-grow: 1;
+    max-width: 400px;
+    margin: 0 15px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    background-color: #1f1f1f;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    background-color: #2a2a2a;
+}
+
+/* الروابط (سطح المكتب) */
+.nav-links {
+    display: flex;
+    gap: 20px;
 }
 
 .nav-links a {
     color: var(--text-color-secondary);
     text-decoration: none;
-    margin-right: 20px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .nav-links a:hover {
     color: var(--primary-color);
 }
 
-/* تصميم الأزرار (محدث) */
-.btn {
+/* === القائمة الجانبية (Sidebar) === */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 250px;
+    height: 100%;
+    background-color: #141414;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.8);
+    z-index: 1001;
+    padding-top: 60px;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.sidebar a {
+    padding: 15px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #e0e0e0;
+    border-bottom: 1px solid #333;
+    display: block;
+}
+
+.close-sidebar-btn {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    background: none;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    color: #000000;
-}
-
-.btn-primary:hover {
-    background-color: #00a0cc;
-}
-
-.btn-secondary {
-    background-color: rgba(100, 100, 100, 0.7);
     color: white;
-    margin-left: 10px;
+    font-size: 30px;
+    cursor: pointer;
 }
 
-.btn-secondary:hover {
-    background-color: rgba(120, 120, 120, 0.9);
-}
-
-
-/* 2. العرض المميز (Hero) */
+/* === 2. العرض المميز (Hero) === */
 .hero-section {
     height: 60vh;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, var(--background-color) 100%), url('https://via.placeholder.com/1500x500?text=Featured+Image');
@@ -89,7 +147,7 @@ body {
     display: flex;
     align-items: center;
     padding: 0 50px;
-    padding-top: 100px;
+    padding-top: 80px;
 }
 
 .hero-content {
@@ -101,19 +159,9 @@ body {
     margin-bottom: 15px;
 }
 
-.hero-content p {
-    font-size: 1.1rem;
-    line-height: 1.5;
-}
-
-/* 3. صفوف المحتوى */
+/* === 3. صفوف المحتوى والملصقات (Poster Fix) === */
 .content-rows {
     padding: 20px 50px;
-}
-
-.category-row h2 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
 }
 
 .row-posters {
@@ -121,15 +169,19 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 20px;
+    gap: 10px;
 }
 
 .row-posters::-webkit-scrollbar {
     display: none;
 }
 
+/* --- الإصلاح المهم لشريط التقدم --- */
 .poster-container {
-    margin-right: 10px;
+    position: relative; /* <--- هذا يمنع الخط الأبيض من الخروج */
     transition: transform 0.3s ease, filter 0.3s ease;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 .poster-container img {
@@ -137,6 +189,7 @@ body {
     height: 300px;
     border-radius: 8px;
     object-fit: cover;
+    display: block;
 }
 
 .poster-container:hover {
@@ -144,29 +197,24 @@ body {
     filter: brightness(1.1);
 }
 
-/* تصميم خاص بصف "أكمل المشاهدة" */
-.progress-poster {
-    position: relative;
-}
-
+/* شريط التقدم */
 .progress-bar {
     width: 90%;
-    height: 5px;
-    background-color: #404040;
+    height: 4px;
+    background-color: rgba(255,255,255,0.3);
     position: absolute;
-    bottom: 15px;
+    bottom: 10px;
     left: 5%;
-    border-radius: 5px;
+    border-radius: 2px;
+    overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
     background-color: var(--primary-color);
-    border-radius: 5px;
 }
 
-/* --- 4. تصميم النافذة المنبثقة (Modal) مضاف هنا --- */
-
+/* === 4. تصميم النافذة المنبثقة (Modal) === */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -177,10 +225,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .modal-overlay.visible {
@@ -196,35 +244,6 @@ body {
     width: 90%;
     max-width: 400px;
     position: relative;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-.modal-overlay.visible .modal-content {
-    transform: scale(1);
-}
-
-.modal-content h2 {
-    color: var(--primary-color); /* أزرق سماوي */
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 25px;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    left: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #aaa;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.close-btn:hover {
-    color: #fff;
 }
 
 .form-group {
@@ -239,120 +258,66 @@ body {
 
 .form-group input {
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px;
     border: 1px solid #555;
     background-color: #333;
     color: #fff;
-    border-radius: 8px;
+    border-radius: 5px;
     box-sizing: border-box;
 }
 
-.modal-btn {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-}
-/* === إضافات القائمة الجانبية وشريط البحث === */
-
-/* 1. زر القائمة (تم تعديله للأزرق) */
-.menu-toggle-btn {
-    background: none;
+/* تصميم الأزرار */
+.btn {
     border: none;
-    color: var(--primary-color); /* تم التغيير للأزرق (#00BFFF) */
-    font-size: 35px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
     cursor: pointer;
-    line-height: 1;
-    margin-left: 15px;
-    display: flex;
-    align-items: center;
-}
-/* 2. شريط البحث */
-.search-container {
-    flex-grow: 1;
-    max-width: 400px;
-    margin: 0 20px;
-    position: relative;
 }
 
-.search-input {
-    width: 100%;
-    padding: 10px 15px;
-    border-radius: 20px;
-    border: 1px solid #333;
-    background-color: #1f1f1f;
+.btn-primary {
+    background-color: var(--primary-color);
+    color: black;
+    width: 100%; /* جعل زر التسجيل عريضاً */
+}
+
+.btn-secondary {
+    background-color: rgba(100, 100, 100, 0.7);
     color: white;
-    outline: none;
-    transition: 0.3s;
 }
 
-.search-input:focus {
-    border-color: var(--primary-color);
-    background-color: #2a2a2a;
-}
-
-/* 3. القائمة الجانبية (Sidebar) */
-.sidebar {
-    position: fixed;
-    top: 0;
-    right: -300px; /* مخفية في البداية */
-    width: 250px;
-    height: 100%;
-    background-color: #141414;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.8);
-    z-index: 1001; /* فوق كل شيء */
-    padding-top: 60px;
-    transition: right 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar.active {
-    right: 0; /* تظهر عند التفعيل */
-}
-
-.sidebar a {
-    padding: 15px 25px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #e0e0e0;
-    border-bottom: 1px solid #333;
-    transition: 0.2s;
-    display: block;
-}
-
-.sidebar a:hover {
-    background-color: #1f1f1f;
-    color: var(--primary-color);
-    padding-right: 35px; /* حركة بسيطة عند التحويم */
-}
-
-.close-sidebar-btn {
+.close-btn {
     position: absolute;
-    top: 15px;
-    left: 20px;
+    top: 10px;
+    left: 15px;
     background: none;
     border: none;
-    color: white;
-    font-size: 30px;
+    color: #aaa;
+    font-size: 24px;
     cursor: pointer;
 }
 
-/* تعديل الشريط العلوي لاستيعاب العناصر الجديدة */
-.navbar {
-    justify-content: flex-start; /* ترتيب العناصر من البداية */
-    gap: 10px;
-}
-
-.navbar-brand {
-    margin-left: auto; /* دفع الشعار لليسار قليلاً */
-}
-
-/* إخفاء الروابط القديمة في الشاشات الصغيرة */
+/* === التجاوب مع الموبايل === */
 @media (max-width: 768px) {
     .nav-links {
-        display: none; /* نخفي الروابط العادية ونعتمد على القائمة الجانبية */
+        display: none;
     }
     .search-container {
-        max-width: 150px; /* تصغير البحث في الموبايل */
+        max-width: 150px;
+        margin: 0 10px;
+    }
+    .navbar-brand h1 {
+        font-size: 20px;
+    }
+    .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .content-rows {
+        padding: 10px 20px;
+    }
+    .poster-container img {
+        width: 140px;
+        height: 210px;
     }
 }
