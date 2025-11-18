@@ -272,3 +272,10 @@ body {
         padding-top: 80px;
     }
 }
+/* تنسيق شعار البطل (بدل النص) */
+.hero-logo-img {
+    max-width: 400px; /* أقصى عرض للشعار */
+    width: 80%; /* ليكون متجاوباً في الموبايل */
+    margin-bottom: 20px; /* مسافة تحته */
+    display: block;
+}
