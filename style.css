@@ -41,7 +41,7 @@ body {
     flex-shrink: 0;
 }
 
-.navbar-brand h1 {
+ {
     color: var(--primary-color);
     margin: 0;
     font-size: 24px;
@@ -319,5 +319,20 @@ body {
     .poster-container img {
         width: 140px;
         height: 210px;
+    }
+}
+/* === تنسيق شعار الصورة === */
+.logo-img {
+    height: 40px; /* ارتفاع مناسب للشريط العلوي */
+    width: auto;  /* العرض يتغير تلقائياً للحفاظ على شكل الشعار */
+    object-fit: contain; /* يضمن ظهور الصورة كاملة دون قص */
+    display: block;
+    cursor: pointer; /* يظهر علامة اليد عند المرور عليه */
+}
+
+/* تعديل للموبايل */
+@media (max-width: 768px) {
+    .logo-img {
+        height: 30px; /* تصغير الشعار قليلاً في الجوال */
     }
 }
