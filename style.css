@@ -59,6 +59,19 @@ body {
     font-size: 20px; /* تصغير قليل للموبايل */
     font-weight: bold;
 }
+/* تنسيق شعار SHASHAFLIX في الشريط العلوي */
+.navbar-logo-img {
+    height: 40px; /* تحديد ارتفاع مناسب */
+    width: auto; /* الحفاظ على نسبة العرض إلى الارتفاع */
+    vertical-align: middle; /* لمحاذاة جيدة مع بقية العناصر */
+}
+
+/* في الموبايل، قد تحتاج لتصغيره أكثر قليلاً */
+@media (max-width: 768px) {
+    .navbar-logo-img {
+        height: 30px; /* تصغير في الموبايل */
+    }
+}
 
 /* القسم الأوسط: شريط البحث */
 .search-container {
@@ -209,7 +222,7 @@ body {
 @media (max-width: 768px) {
     /* تعديلات خاصة للموبايل لضمان ظهور البحث */
     .nav-links { display: none; }
-    .navbar-brand h1 { display: none; } /* إخفاء اسم الموقع في الموبايل لتوفير مساحة للبحث */
+ 
     
     .search-container { 
         margin: 0 10px; 
