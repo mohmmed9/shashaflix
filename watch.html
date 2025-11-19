@@ -7,73 +7,19 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body { overflow-x: hidden; }
-        
-        /* حاوية الصفحة */
-        .watch-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            height: calc(100vh - 70px); /* ارتفاع كامل ناقص النافبار */
-            padding-top: 70px; 
-        }
-        
-        /* 1. قسم الفيديو (يمين) */
-        .main-content { 
-            flex: 3; 
-            background: #000; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; /* توسيط الفيديو عمودياً */
-        }
-        
-        .video-wrapper { 
-            position: relative; 
-            width: 100%; 
-            height: 100%; 
-        }
-        
-        .video-player { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-        }
-        
-        /* 2. القائمة الجانبية (يسار) */
-        .episodes-section { 
-            flex: 1; 
-            background: #1f1f1f; 
-            border-right: 1px solid #333; 
-            min-width: 300px; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
+        .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
+        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; }
+        .video-wrapper { position: relative; width: 100%; height: 100%; }
+        .video-player { width: 100%; height: 100%; border: none; }
+        .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
         .season-selector { padding: 20px; background: #141414; }
         .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; font-size: 16px; }
-        
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        
-        .episode-item { 
-            display: flex; 
-            padding: 15px; 
-            margin-bottom: 5px; 
-            background: #2a2a2a; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            transition: 0.2s;
-            align-items: center;
-        }
-        
+        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
-        
         .episode-info h4 { margin: 0; font-size: 14px; }
-
-        /* للموبايل */
-        @media (max-width: 768px) {
-            .watch-container { height: auto; flex-direction: column; }
-            .main-content { height: 40vh; } /* الفيديو يأخذ جزء من الشاشة */
-            .episodes-section { height: 60vh; }
-        }
+        @media (max-width: 768px) { .watch-container { height: auto; flex-direction: column; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
     </style>
 </head>
 <body>
@@ -86,96 +32,104 @@
     </header>
 
     <div class="watch-container">
-        
         <div class="main-content">
             <div class="video-wrapper">
                 <iframe id="main-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
         </div>
-
         <div class="episodes-section">
             <div class="season-selector">
-                <select id="season-select" onchange="changeSeason(this.value)"></select>
+                <select id="season-select"></select>
             </div>
-            <div class="episodes-list" id="episodes-container"></div>
+            <div class="episodes-list" id="episodes-container">
+                <p style="color:white; text-align:center; padding:20px;">جاري التحميل...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // ====================================================
-        // 🟢 هنا تضع روابط الحلقات (رابط واحد لكل حلقة)
-        // ====================================================
-        
-        const allSeries = {
-            // مثال: مسلسل بوكو نو هيرو
-            "Boku No Hero": { 
-                "1": [ // الموسم 1
-                    // ضع أي رابط هنا (يوتيوب، سيرفر خارجي، ملف مباشر)
-                    { title: "الحلقة 1", url: "https://www.youtube.com/embed/DkLjq4C_k8c" },
-                    { title: "الحلقة 2", url: "https://www.youtube.com/embed/VIDEO_ID_HERE" },
-                    { title: "الحلقة 3", url: "https://www.youtube.com/embed/VIDEO_ID_HERE" }
-                ],
-                "2": [ // الموسم 2
-                    { title: "الحلقة 1", url: "https://www.youtube.com/embed/VIDEO_ID_HERE" }
-                ]
-            },
-
-            // مثال: مسلسل آخر
-            "Breaking Bad": { 
-                "1": [
-                    { title: "Pilot", url: "https://example.com/embed/breakingbad_s01e01" }
-                ]
-            }
-        };
-
-        // ====================================================
-        // 🛑 لا تعدل شيئاً في الأسفل
-        // ====================================================
+        // !!! رابط السيرفر الخاص بك !!!
+        const renderBaseUrl = 'https://shashaflix.onrender.com';
 
         const urlParams = new URLSearchParams(window.location.search);
-        const seriesId = urlParams.get('id'); // جلب اسم المسلسل من الرابط
+        const seriesId = urlParams.get('id');
+        
         const player = document.getElementById('main-player');
         const episodesContainer = document.getElementById('episodes-container');
         const seasonSelect = document.getElementById('season-select');
+        
+        let currentSeasonsData = {}; // لتخزين بيانات المواسم
 
-        let currentSeriesData = allSeries[seriesId];
+        // 1. جلب البيانات من Firebase
+        async function fetchSeriesData() {
+            try {
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                const works = await response.json();
+                
+                // البحث عن المسلسل المطلوب بواسطة الـ ID
+                const currentWork = works.find(work => work.id === seriesId);
 
-        if (currentSeriesData) {
-            // تعبئة قائمة المواسم
-            const seasons = Object.keys(currentSeriesData);
-            seasons.forEach(s => {
-                seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
-            });
-            // تشغيل أول موسم
-            changeSeason(seasons[0]);
-        } else {
-            episodesContainer.innerHTML = "<p style='color:white; padding:20px; text-align:center;'>عذراً، هذا المسلسل غير مضاف في ملف watch.html حتى الآن.</p>";
+                if (currentWork && currentWork.seasons) {
+                    currentSeasonsData = currentWork.seasons;
+                    initSeasons();
+                } else {
+                    episodesContainer.innerHTML = "<p style='color:white; padding:20px; text-align:center;'>لا توجد حلقات مضافة لهذا العمل في قاعدة البيانات.</p>";
+                }
+            } catch (error) {
+                console.error(error);
+                episodesContainer.innerHTML = "<p style='color:red; padding:20px; text-align:center;'>خطأ في الاتصال.</p>";
+            }
         }
 
-        function changeSeason(season) {
-            episodesContainer.innerHTML = "";
-            const episodes = currentSeriesData[season];
+        // 2. تهيئة قائمة المواسم
+        function initSeasons() {
+            const seasonKeys = Object.keys(currentSeasonsData); // ["1", "2", ...]
+            seasonSelect.innerHTML = "";
             
-            episodes.forEach((ep, index) => {
-                const div = document.createElement('div');
-                div.className = 'episode-item';
-                div.innerHTML = `<div class="episode-info"><h4>${ep.title}</h4></div>`;
-                
-                div.onclick = () => {
-                    // تشغيل الفيديو
-                    player.src = ep.url;
-                    
-                    // تلوين الحلقة المختارة
-                    document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
-                    div.classList.add('active');
-                };
-                episodesContainer.appendChild(div);
+            seasonKeys.forEach(s => {
+                seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
             });
 
-            // تشغيل الحلقة الأولى تلقائياً عند اختيار الموسم
-            if(episodes.length > 0) {
-                episodesContainer.children[0].click();
+            // عند تغيير الموسم من القائمة
+            seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
+
+            // تشغيل أول موسم تلقائياً
+            if (seasonKeys.length > 0) {
+                loadEpisodes(seasonKeys[0]);
             }
+        }
+
+        // 3. عرض الحلقات
+        function loadEpisodes(seasonKey) {
+            episodesContainer.innerHTML = "";
+            const episodes = currentSeasonsData[seasonKey]; // مصفوفة الحلقات
+
+            if (episodes && episodes.length > 0) {
+                episodes.forEach((ep) => {
+                    const div = document.createElement('div');
+                    div.className = 'episode-item';
+                    div.innerHTML = `<div class="episode-info"><h4>${ep.title}</h4></div>`;
+                    
+                    div.onclick = () => {
+                        player.src = ep.url;
+                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+                        div.classList.add('active');
+                    };
+                    episodesContainer.appendChild(div);
+                });
+
+                // تشغيل الحلقة الأولى في الموسم تلقائياً
+                episodesContainer.children[0].click();
+            } else {
+                episodesContainer.innerHTML = "<p style='color:gray; text-align:center;'>لا توجد حلقات في هذا الموسم.</p>";
+            }
+        }
+
+        // بدء التشغيل
+        if (seriesId) {
+            fetchSeriesData();
+        } else {
+            episodesContainer.innerHTML = "<p style='color:red; padding:20px; text-align:center;'>رابط غير صحيح (لا يوجد ID).</p>";
         }
     </script>
 
