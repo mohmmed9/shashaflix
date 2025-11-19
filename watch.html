@@ -48,7 +48,7 @@
     </div>
 
     <script>
-        // !!! رابط السيرفر الخاص بك !!!
+        // رابط السيرفر (Render)
         const renderBaseUrl = 'https://shashaflix.onrender.com';
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -58,22 +58,25 @@
         const episodesContainer = document.getElementById('episodes-container');
         const seasonSelect = document.getElementById('season-select');
         
-        let currentSeasonsData = {}; // لتخزين بيانات المواسم
+        let currentSeasonsData = {}; 
 
-        // 1. جلب البيانات من Firebase
         async function fetchSeriesData() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
                 const works = await response.json();
-                
-                // البحث عن المسلسل المطلوب بواسطة الـ ID
                 const currentWork = works.find(work => work.id === seriesId);
 
-                if (currentWork && currentWork.seasons) {
-                    currentSeasonsData = currentWork.seasons;
-                    initSeasons();
+                // هنا السحر: نقرأ البيانات سواء كانت خريطة أو نص JSON
+                if (currentWork && currentWork.seasons_data) {
+                    // تحويل النص إلى كائن بيانات
+                    try {
+                        currentSeasonsData = JSON.parse(currentWork.seasons_data);
+                        initSeasons();
+                    } catch (e) {
+                        episodesContainer.innerHTML = "<p style='color:red; padding:20px;'>خطأ في تنسيق البيانات في Firebase.</p>";
+                    }
                 } else {
-                    episodesContainer.innerHTML = "<p style='color:white; padding:20px; text-align:center;'>لا توجد حلقات مضافة لهذا العمل في قاعدة البيانات.</p>";
+                    episodesContainer.innerHTML = "<p style='color:white; padding:20px; text-align:center;'>لا توجد حلقات مضافة.</p>";
                 }
             } catch (error) {
                 console.error(error);
@@ -81,28 +84,24 @@
             }
         }
 
-        // 2. تهيئة قائمة المواسم
         function initSeasons() {
-            const seasonKeys = Object.keys(currentSeasonsData); // ["1", "2", ...]
+            const seasonKeys = Object.keys(currentSeasonsData);
             seasonSelect.innerHTML = "";
             
             seasonKeys.forEach(s => {
                 seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
             });
 
-            // عند تغيير الموسم من القائمة
             seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
 
-            // تشغيل أول موسم تلقائياً
             if (seasonKeys.length > 0) {
                 loadEpisodes(seasonKeys[0]);
             }
         }
 
-        // 3. عرض الحلقات
         function loadEpisodes(seasonKey) {
             episodesContainer.innerHTML = "";
-            const episodes = currentSeasonsData[seasonKey]; // مصفوفة الحلقات
+            const episodes = currentSeasonsData[seasonKey];
 
             if (episodes && episodes.length > 0) {
                 episodes.forEach((ep) => {
@@ -117,19 +116,16 @@
                     };
                     episodesContainer.appendChild(div);
                 });
-
-                // تشغيل الحلقة الأولى في الموسم تلقائياً
-                episodesContainer.children[0].click();
+                // تشغيل الحلقة الأولى تلقائياً
+                player.src = episodes[0].url;
+                episodesContainer.children[0].classList.add('active');
             } else {
-                episodesContainer.innerHTML = "<p style='color:gray; text-align:center;'>لا توجد حلقات في هذا الموسم.</p>";
+                episodesContainer.innerHTML = "<p style='color:gray; text-align:center;'>لا توجد حلقات.</p>";
             }
         }
 
-        // بدء التشغيل
         if (seriesId) {
             fetchSeriesData();
-        } else {
-            episodesContainer.innerHTML = "<p style='color:red; padding:20px; text-align:center;'>رابط غير صحيح (لا يوجد ID).</p>";
         }
     </script>
 
