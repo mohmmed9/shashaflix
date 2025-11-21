@@ -233,3 +233,38 @@ body {
     
     /* إذا أردت إظهار "دخول" في الموبايل، قم بإزالة السطر السابق، لكن قد يضيق البحث */
 }
+/* === تنسيق الشبكة (لأحدث الإضافات) === */
+.grid-posters {
+    display: grid;
+    /* هنا نحدد 7 أعمدة متساوية */
+    grid-template-columns: repeat(7, 1fr); 
+    gap: 15px; /* مسافة بين البوسترات */
+    padding-bottom: 40px;
+}
+
+/* تعديل البوسترات داخل الشبكة لتتأقلم مع الحجم */
+.grid-posters .poster-container {
+    width: 100%; /* تأخذ عرض الخانة بالكامل */
+    margin: 0;
+}
+
+.grid-posters .poster-container img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3; /* للحفاظ على شكل البوستر الطولي */
+}
+
+/* === التجاوب مع الشاشات الأصغر (مهم جداً) === */
+/* على اللابتوب الصغير أو التابلت نعرض 5 أو 4 */
+@media (max-width: 1200px) {
+    .grid-posters { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (max-width: 900px) {
+    .grid-posters { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* على الموبايل نعرض 3 أو 2 فقط لتكون واضحة */
+@media (max-width: 600px) {
+    .grid-posters { grid-template-columns: repeat(3, 1fr); }
+}
