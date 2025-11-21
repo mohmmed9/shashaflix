@@ -8,17 +8,29 @@
     <style>
         body { overflow-x: hidden; }
         .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
+        
+        /* قسم الفيديو */
         .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; }
         .video-wrapper { position: relative; width: 100%; height: 100%; }
         .video-player { width: 100%; height: 100%; border: none; }
+        
+        /* القائمة الجانبية */
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
-        .season-selector { padding: 20px; background: #141414; }
-        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; font-size: 16px; }
+        
+        .season-selector { padding: 20px; background: #141414; border-bottom: 1px solid #333; }
+        .season-selector label { display: block; color: #aaa; margin-bottom: 5px; font-size: 14px; }
+        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; outline: none; }
+        
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
+        
         .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
         .episode-info h4 { margin: 0; font-size: 14px; }
+
+        /* رسائل التحميل */
+        .status-msg { color: white; text-align: center; padding: 20px; margin-top: 50px; }
+
         @media (max-width: 768px) { .watch-container { height: auto; flex-direction: column; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
     </style>
 </head>
@@ -37,106 +49,114 @@
                 <iframe id="main-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
         </div>
+
         <div class="episodes-section">
             <div class="season-selector">
-                <select id="season-select" onchange="changeSeason(this.value)"></select>
+                <label>اختر الموسم:</label>
+                <select id="season-select"></select>
             </div>
-            <div class="episodes-list" id="episodes-container"></div>
+            <div class="episodes-list" id="episodes-container">
+                <p class="status-msg">جاري تحميل الحلقات...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // ====================================================
-        // 🟢 منطقة التعديل اليدوي: هنا تضع الحلقات
-        // ====================================================
-        
-        const allSeries = {
-            // يجب أن يكون هذا الاسم هو نفس الـ ID الموجود في Firebase بالضبط
-            // مثال: إذا كان ID المسلسل في فايربيس هو "Dexter_S1"، اكتبه هنا كما هو
-            
-            "https://shashaflix.vercel.app/watch.html?id=Boku%20No%20Hero": { 
-                "1": [ // الموسم 1
-                    { title: "الحلقة 1", url: "#" },
-                    { title: "الحلقة 2", url: "#" }
-                      { title: "الحلقة 3", url: "#" }
-                      { title: "الحلقة 4", url: "#" }
-                      { title: "الحلقة 5", url: "#" }
-                      { title: "الحلقة 6", url: "#" }
-                      { title: "الحلقة 7", url: "#" }
-                      { title: "الحلقة 8", url: "#" }
-                      { title: "الحلقة 9", url: "#" }
-                      { title: "الحلقة 10", url: "#" }
-                      { title: "الحلقة 11", url: "#" }
-                      { title: "الحلقة 12", url: "#" }
-                      { title: "الحلقة 13", url: "#" }
-                ],
-                "2": [ // الموسم 2
-                    { title: "الحلقة 1", url: "#" }
-                ]
-            },
-
-            // مثال لمسلسل آخر
-            "Another_Series_ID": { 
-                "1": [
-                    { title: "الحلقة 1", url: "..." }
-                ]
-            }
-        };
-
-        // ====================================================
-        // 🛑 الكود البرمجي (لا تعدل شيئاً هنا)
-        // ====================================================
+        // !!! هام: رابط السيرفر الخاص بك !!!
+        const renderBaseUrl = 'https://shashaflix.onrender.com';
 
         const urlParams = new URLSearchParams(window.location.search);
-        const seriesId = urlParams.get('id'); 
+        const seriesId = urlParams.get('id'); // جلب ID المسلسل من الرابط
         
         const player = document.getElementById('main-player');
         const episodesContainer = document.getElementById('episodes-container');
         const seasonSelect = document.getElementById('season-select');
+        
+        let currentSeasonsData = {}; // هنا سنخزن البيانات القادمة من Firebase
 
-        let currentSeriesData = allSeries[seriesId];
+        // 1. دالة الاتصال بالسيرفر وجلب البيانات
+        async function fetchSeriesData() {
+            try {
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                if (!response.ok) throw new Error('فشل الاتصال بالسيرفر');
+                
+                const works = await response.json();
+                
+                // البحث عن المسلسل المطلوب
+                const currentWork = works.find(work => work.id === seriesId);
 
-        if (currentSeriesData) {
-            // ملء القائمة بالمواسم
-            const seasons = Object.keys(currentSeriesData);
-            seasonSelect.innerHTML = "";
-            seasons.forEach(s => {
-                seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
-            });
-            
-            // تشغيل الموسم الأول
-            changeSeason(seasons[0]);
-        } else {
-            episodesContainer.innerHTML = "<p style='color:white; padding:20px; text-align:center;'>عذراً، الحلقات غير مضافة في الكود لهذا المسلسل.</p>";
+                if (currentWork && currentWork.seasons) {
+                    // وجدنا المسلسل وفيه حلقات
+                    currentSeasonsData = currentWork.seasons;
+                    initSeasons();
+                } else {
+                    episodesContainer.innerHTML = "<p class='status-msg'>لم يتم إضافة حلقات لهذا العمل في قاعدة البيانات حتى الآن.</p>";
+                }
+            } catch (error) {
+                console.error(error);
+                episodesContainer.innerHTML = "<p class='status-msg' style='color:red;'>حدث خطأ في الاتصال. تأكد من الإنترنت أو الخادم.</p>";
+            }
         }
 
-        function changeSeason(season) {
-            episodesContainer.innerHTML = "";
-            const episodes = currentSeriesData[season];
+        // 2. تجهيز قائمة المواسم
+        function initSeasons() {
+            const seasonKeys = Object.keys(currentSeasonsData); // [1, 2, 3...]
+            seasonSelect.innerHTML = "";
             
+            if (seasonKeys.length === 0) {
+                episodesContainer.innerHTML = "<p class='status-msg'>المجلد فارغ.</p>";
+                return;
+            }
+
+            // ترتيب المواسم
+            seasonKeys.sort().forEach(s => {
+                seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
+            });
+
+            // عند تغيير الموسم، نعرض حلقاته
+            seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
+
+            // تشغيل أول موسم تلقائياً
+            loadEpisodes(seasonKeys[0]);
+        }
+
+        // 3. عرض حلقات الموسم المختار
+        function loadEpisodes(seasonKey) {
+            episodesContainer.innerHTML = "";
+            const episodes = currentSeasonsData[seasonKey]; // مصفوفة الحلقات
+
             if (episodes && episodes.length > 0) {
-                episodes.forEach((ep) => {
+                episodes.forEach((ep, index) => {
                     const div = document.createElement('div');
                     div.className = 'episode-item';
                     div.innerHTML = `<div class="episode-info"><h4>${ep.title}</h4></div>`;
                     
                     div.onclick = () => {
+                        // تشغيل الفيديو (مع autoplay)
                         const videoUrl = ep.url.includes('?') ? `${ep.url}&autoplay=1` : `${ep.url}?autoplay=1`;
                         player.src = videoUrl;
+                        
+                        // تلوين الحلقة النشطة
                         document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
                         div.classList.add('active');
                     };
                     episodesContainer.appendChild(div);
                 });
-                // تشغيل الحلقة الأولى
+
+                // تشغيل الحلقة الأولى تلقائياً
                 episodesContainer.children[0].click();
             } else {
-                episodesContainer.innerHTML = "<p style='color:gray; text-align:center;'>لا توجد حلقات.</p>";
+                episodesContainer.innerHTML = "<p class='status-msg'>لا توجد حلقات في هذا الموسم.</p>";
             }
+        }
+
+        // بدء التنفيذ عند فتح الصفحة
+        if (seriesId) {
+            fetchSeriesData();
+        } else {
+            episodesContainer.innerHTML = "<p class='status-msg' style='color:red;'>رابط خاطئ (مفقود ID).</p>";
         }
     </script>
 
 </body>
 </html>
-
-
