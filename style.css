@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
-    --primary-color: #00BFFF;
+    --primary-color: #00BFFF; /* أزرق سماوي */
     --background-color: #121212;
     --card-color: #1f1f1f;
     --text-color: #ffffff;
@@ -23,7 +23,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 15px;
+    padding: 10px 20px; /* هوامش مريحة للشريط */
     background-color: #141414;
     position: fixed;
     width: 100%;
@@ -31,13 +31,13 @@ body {
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
-    height: 60px;
+    height: 70px; /* زيادة بسيطة في الارتفاع */
 }
 
 .nav-left-section {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     flex-shrink: 0;
 }
 
@@ -45,36 +45,35 @@ body {
     background: none;
     border: none;
     color: var(--primary-color);
-    font-size: 28px;
+    font-size: 32px;
     cursor: pointer;
-    padding: 0;
     display: flex;
     align-items: center;
 }
 
 .navbar-logo-img {
-    height: 35px;
+    height: 40px;
     width: auto;
     vertical-align: middle;
 }
 
 .search-container {
     flex-grow: 1;
-    margin: 0 15px;
+    margin: 0 30px; /* مسافة أكبر حول البحث */
     display: flex;
     justify-content: center;
 }
 
 .search-input {
     width: 100%;
-    max-width: 400px;
-    padding: 8px 12px;
-    border-radius: 20px;
+    max-width: 500px; /* بحث أعرض */
+    padding: 10px 15px;
+    border-radius: 25px;
     border: 1px solid #333;
     background-color: #1f1f1f;
     color: white;
     outline: none;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .search-input:focus {
@@ -84,30 +83,29 @@ body {
 
 .nav-links {
     display: flex;
-    gap: 15px;
-    display: none;
+    gap: 20px;
 }
 
 .nav-links a {
     color: var(--text-color-secondary);
     text-decoration: none;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .nav-account {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
 .btn {
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: 8px 16px;
+    border-radius: 5px;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 14px;
     cursor: pointer;
     white-space: nowrap;
 }
@@ -119,77 +117,81 @@ body {
 .sidebar {
     position: fixed;
     top: 0;
-    right: -260px;
-    width: 250px;
+    right: -280px;
+    width: 260px;
     height: 100%;
     background-color: #141414;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.8);
+    box-shadow: -2px 0 15px rgba(0,0,0,0.8);
     z-index: 1100;
-    padding-top: 60px;
+    padding-top: 80px;
     transition: right 0.3s ease;
     display: flex;
     flex-direction: column;
 }
 .sidebar.active { right: 0; }
 .sidebar a {
-    padding: 15px 20px;
+    padding: 15px 25px;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 18px;
     color: #e0e0e0;
     border-bottom: 1px solid #222;
 }
 .close-sidebar-btn {
     position: absolute;
-    top: 10px;
-    left: 15px;
+    top: 15px;
+    left: 20px;
     background: none;
     border: none;
     color: white;
-    font-size: 28px;
+    font-size: 30px;
     cursor: pointer;
 }
 
 /* === Hero === */
 .hero-section {
-    height: 60vh;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0.6), var(--background-color)), url('https://via.placeholder.com/1500x500?text=Hero');
+    height: 65vh;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.5), var(--background-color)), url('https://via.placeholder.com/1500x500?text=Hero');
     background-size: cover;
     background-position: center;
     display: flex;
     align-items: center;
-    padding: 0 20px;
-    padding-top: 60px;
+    padding: 0 40px;
+    padding-top: 70px;
 }
-.hero-content { max-width: 500px; width: 100%; }
-.hero-logo-img { max-width: 250px; width: 70%; margin-bottom: 10px; display: block; }
+.hero-content { max-width: 600px; width: 100%; }
+.hero-logo-img { max-width: 300px; width: 80%; margin-bottom: 15px; display: block; }
 
-/* === تنسيق الصفوف والبوسترات (تم الإصلاح هنا) === */
-.content-rows { padding: 20px; }
+/* === تنسيق الصفوف والشبكة (التعديل الأساسي هنا) === */
+.content-rows { padding: 30px 40px; } /* زيادة الهوامش الخارجية للصفحة */
 
-/* تقليل المسافة تحت العنوان */
 .category-row h2 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-    margin-top: 0;
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    margin-top: 10px;
     color: #fff;
+    border-right: 4px solid var(--primary-color); /* لمسة جمالية للعنوان */
+    padding-right: 10px;
 }
 
 /* صف التمرير الأفقي (الأكثر مشاهدة) */
 .row-posters {
     display: flex;
     overflow-x: auto;
-    gap: 8px; /* مسافة صغيرة جداً بين الصور */
-    padding-bottom: 10px;
+    gap: 15px; /* زيادة المسافة بين الصور */
+    padding-bottom: 15px;
     scroll-behavior: smooth;
 }
 .row-posters::-webkit-scrollbar { display: none; }
 
-/* شبكة العرض (أحدث الإضافات) - 7 أعمدة */
+/* === شبكة العرض (أحدث الإضافات) - التوازن === */
 .grid-posters {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7 أعمدة */
-    gap: 10px; /* مسافة صغيرة بين الشبكة */
-    padding-bottom: 40px;
+    /* هنا التغيير: 7 أعمدة مع مسافة (gap) أكبر.
+       1fr يعني أن الأعمدة ستتوسع لتملأ الشاشة بالتساوي.
+    */
+    grid-template-columns: repeat(7, 1fr); 
+    gap: 25px; /* <--- زيادة كبيرة للفراغ ليكون متوازناً */
+    padding-bottom: 50px;
 }
 
 /* حاوية البوستر */
@@ -197,61 +199,74 @@ body {
     position: relative;
     flex-shrink: 0;
     cursor: pointer;
-    transition: transform 0.2s;
-    margin: 0; /* إزالة أي هوامش خارجية */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden; /* لضمان أن الصورة لا تخرج */
 }
 
 .poster-container:hover {
     transform: scale(1.05);
     z-index: 10;
+    box-shadow: 0 5px 15px rgba(0, 191, 255, 0.3); /* ظل أزرق خفيف عند التحويم */
 }
 
 /* الصور */
 .poster-container img {
-    width: 100%; /* تملأ الحاوية */
+    width: 100%;
     height: auto;
-    aspect-ratio: 2/3; /* الحفاظ على شكل البوستر */
-    border-radius: 6px;
+    aspect-ratio: 2/3;
     object-fit: cover;
     display: block;
 }
 
-/* تحديد حجم ثابت لصور الصف الأفقي فقط */
-.row-posters .poster-container {
-    width: 150px; /* عرض ثابت للصف الأفقي */
-}
+/* حجم ثابت للصف الأفقي فقط */
+.row-posters .poster-container { width: 160px; }
 
 /* شريط التقدم */
-.progress-bar { width: 90%; height: 3px; background: rgba(255,255,255,0.3); position: absolute; bottom: 8px; left: 5%; border-radius: 2px; }
+.progress-bar { width: 100%; height: 4px; background: rgba(0,0,0,0.5); position: absolute; bottom: 0; left: 0; }
 .progress-fill { height: 100%; background-color: var(--primary-color); }
 
 /* النوافذ */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: 0.3s; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: 0.3s; }
 .modal-overlay.visible { visibility: visible; opacity: 1; }
-.modal-content { background: #1f1f1f; padding: 25px; border-radius: 8px; width: 90%; max-width: 350px; position: relative; }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; color: #ccc; font-size: 14px; }
-.form-group input { width: 100%; padding: 10px; border: 1px solid #444; background: #333; color: #fff; border-radius: 4px; box-sizing: border-box; }
-.close-btn { position: absolute; top: 10px; left: 15px; font-size: 24px; color: #aaa; background: none; border: none; cursor: pointer; }
+.modal-content { background: #1f1f1f; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; color: #ccc; font-size: 14px; }
+.form-group input { width: 100%; padding: 12px; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 6px; box-sizing: border-box; }
+.close-btn { position: absolute; top: 15px; left: 20px; font-size: 28px; color: #aaa; background: none; border: none; cursor: pointer; }
 
-/* === التجاوب === */
-@media (min-width: 769px) {
-    .nav-links { display: flex; }
-    /* تكبير الصور قليلاً في الشاشات الكبيرة */
-    .row-posters .poster-container { width: 180px; }
+/* === التجاوب (تعديل الأعمدة حسب حجم الشاشة) === */
+@media (min-width: 1400px) {
+    .grid-posters { grid-template-columns: repeat(8, 1fr); } /* شاشات كبيرة جداً: 8 أعمدة */
 }
 
 @media (max-width: 1200px) {
-    .grid-posters { grid-template-columns: repeat(5, 1fr); }
+    .grid-posters { grid-template-columns: repeat(6, 1fr); }
 }
 
-@media (max-width: 900px) {
-    .grid-posters { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 992px) {
+    .grid-posters { grid-template-columns: repeat(5, 1fr); }
 }
 
 @media (max-width: 768px) {
     .nav-links { display: none; }
-    .grid-posters { grid-template-columns: repeat(3, 1fr); }
-    .row-posters .poster-container { width: 130px; }
-    .hero-logo-img { width: 80%; }
+    .navbar-brand h1 { display: none; } /* إخفاء الاسم في الموبايل */
+    
+    .content-rows { padding: 15px; } /* تقليل الهوامش في الموبايل */
+    
+    /* تعديل الشبكة للموبايل */
+    .grid-posters { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 10px; /* تقليل الفراغ في الموبايل */
+    }
+    
+    .row-posters .poster-container { width: 120px; }
+    
+    .hero-section { padding: 0 20px; }
+    .search-container { margin: 0 10px; }
+    .btn { padding: 6px 10px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+    .grid-posters { grid-template-columns: repeat(2, 1fr); } /* شاشات صغيرة جداً: عمودين */
 }
