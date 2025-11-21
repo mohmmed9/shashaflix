@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHASHAFLIX</title>
+    <title>منصة الأفلام (SHASHAFLIX)</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="/manifest.json">
 </head>
@@ -12,11 +12,10 @@
     <div id="mySidebar" class="sidebar">
         <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
-        <a href="#"> الرئيسية</a>
-        <a href="#"> الأكثر مشاهدة</a>
-        <a href="#"> أفلام</a>
-        <a href="#"> مسلسلات</a>
-                <a href="#"> القائمة المفضلة</a>
+        <a href="#">🏠 الرئيسية</a>
+        <a href="#">🔥 الأكثر مشاهدة</a>
+        <a href="#">🎬 أفلام</a>
+        <a href="#">📺 مسلسلات</a>
     </div>
 
     <header class="navbar">
@@ -28,20 +27,23 @@
         </div>
 
         <div class="search-container">
-            <input type="text" id="search-input" class="search-input" placeholder="ابحث عن اسم الفيلم...">
+            <input type="text" id="search-input" class="search-input" placeholder="ابحث عن فيلم...">
         </div>
 
+        <nav class="nav-links">
+            <a href="#">الرئيسية</a>
+            <a href="#">أفلام</a>
+        </nav>
 
         <div class="nav-account">
-            <button class="btn btn-secondary" onclick="document.getElementById('signup-modal').classList.add('visible')">دخول</button>
-            <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
+            <button class="btn btn-secondary" onclick="openModal('login-modal')">دخول</button>
+            <button class="btn btn-primary" onclick="openModal('signup-modal')">حساب جديد</button>
         </div>
     </header>
 
     <section class="hero-section">
         <div class="hero-content">
-            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img" onerror="this.style.display='none'; document.querySelector('.hero-content h2').style.display='block'">
-            <h2 style="display:none; font-size:3rem; color:var(--primary-color);">SHASHAFLIX</h2>
+            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img" onerror="this.style.display='none';">
             <p>شاهد أفضل الأفلام والمسلسلات بجودة عالية.</p>
             <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
         </div>
@@ -56,107 +58,120 @@
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
-            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
-            <h2>إنشاء حساب</h2>
+            <button class="close-btn" onclick="closeModal('signup-modal')">&times;</button>
+            <h2>إنشاء حساب جديد</h2>
             <form id="signup-form">
-                <div class="form-group"><input type="text" id="username" placeholder="الاسم" required></div>
-                <div class="form-group"><input type="email" id="email" placeholder="الإيميل" required></div>
-                <div class="form-group"><input type="password" id="password" placeholder="كلمة المرور" required></div>
+                <div class="form-group"><label>الاسم</label><input type="text" id="reg-username" required></div>
+                <div class="form-group"><label>الإيميل</label><input type="email" id="reg-email" required></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" id="reg-password" required></div>
                 <button type="submit" class="btn btn-primary" style="width:100%">تسجيل</button>
             </form>
         </div>
     </div>
 
-    <script>
-        // 1. المتغيرات
-        const renderBaseUrl = 'https://shashaflix.onrender.com';
-        let allWorksData = []; // هنا سنحفظ نسخة من الأفلام للبحث
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
+            <h2>تسجيل الدخول</h2>
+            <form id="login-form">
+                <div class="form-group"><label>الإيميل</label><input type="email" id="login-email" required></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" id="login-password" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">دخول</button>
+            </form>
+        </div>
+    </div>
 
-        // 2. دالة جلب البيانات
+    <script>
+        const renderBaseUrl = 'https://shashaflix.onrender.com';
+        let allWorksData = [];
+
+        // إدارة النوافذ
+        function openModal(id) { document.getElementById(id).classList.add('visible'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
+        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
+
+        // 1. جلب الأفلام
         async function fetchWorks() {
             const container = document.getElementById('trending-row');
-            
             try {
-                console.log("جاري الاتصال بالخادم...");
                 const response = await fetch(`${renderBaseUrl}/api/works`);
-                
-                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
-                
-                const data = await response.json();
-                console.log("تم جلب البيانات:", data); // للفحص
-
-                // حفظ البيانات في المتغير العام للبحث
-                allWorksData = data;
-
-                // عرض البيانات
+                if (!response.ok) throw new Error();
+                allWorksData = await response.json();
                 displayMovies(allWorksData);
-
             } catch (error) {
-                console.error("خطأ:", error);
-                container.innerHTML = '<p style="color:red; padding:20px">فشل الاتصال بالخادم. تأكد أنه يعمل.</p>';
+                container.innerHTML = '<p style="color:red; padding:20px">جاري الاتصال بالخادم...</p>';
             }
         }
 
-        // 3. دالة عرض الأفلام (تستخدم للعرض الأولي وللبحث)
         function displayMovies(movies) {
             const container = document.getElementById('trending-row');
-            container.innerHTML = ''; // تنظيف
-
-            if (!movies || movies.length === 0) {
-                container.innerHTML = '<p style="color:white; padding:20px">لا توجد نتائج.</p>';
-                return;
-            }
-
+            container.innerHTML = '';
+            if (!movies.length) { container.innerHTML = '<p style="color:white; padding:20px">لا توجد نتائج.</p>'; return; }
             movies.forEach(work => {
-                // حماية من البيانات الناقصة
-                const image = work.posterUrl || 'https://via.placeholder.com/200x300';
-                const title = work.title || 'بدون عنوان';
-                const id = work.id || '';
-
+                const img = work.posterUrl || 'https://via.placeholder.com/200x300';
                 container.innerHTML += `
-                    <div class="poster-container" onclick="window.location.href='watch.html?id=${id}'">
-                        <img src="${image}" alt="${title}">
+                    <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
+                        <img src="${img}" alt="${work.title}">
                         <div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
-        // 4. منطق البحث (المصحح)
-        const searchInput = document.getElementById('search-input');
-        const sectionTitle = document.getElementById('section-title');
-
-        searchInput.addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase().trim();
-            console.log("يبحث عن:", text);
-
-            if (text === "") {
-                sectionTitle.innerText = "الأكثر مشاهدة";
-                displayMovies(allWorksData); // إعادة عرض الكل
-            } else {
-                sectionTitle.innerText = "نتائج البحث";
-                // الفلترة
-                const filtered = allWorksData.filter(movie => {
-                    // نتأكد أن الفيلم له عنوان قبل البحث فيه
-                    return movie.title && movie.title.toLowerCase().includes(text);
-                });
-                displayMovies(filtered);
-            }
+        // 2. البحث
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            const filtered = allWorksData.filter(w => w.title && w.title.toLowerCase().includes(text));
+            displayMovies(text ? filtered : allWorksData);
+            document.getElementById('section-title').innerText = text ? "نتائج البحث" : "الأكثر مشاهدة";
         });
 
-        // 5. دوال المساعدة (القائمة والتسجيل)
-        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
-        document.getElementById('open-signup-btn').onclick = () => document.getElementById('signup-modal').classList.add('visible');
-        
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
+        // 3. إنشاء حساب (Register)
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // كود التسجيل المختصر
-            alert("تم إرسال طلب التسجيل (تجريبي)"); 
+            const data = {
+                username: document.getElementById('reg-username').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
+            };
+            sendAuthRequest('/register', data, 'signup-modal');
         });
 
-        // التشغيل
-        fetchWorks();
+        // 4. تسجيل الدخول (Login) - جديد
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+            sendAuthRequest('/login', data, 'login-modal');
+        });
 
+        // دالة مساعدة للإرسال
+        async function sendAuthRequest(endpoint, data, modalId) {
+            try {
+                const res = await fetch(`${renderBaseUrl}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (res.ok) {
+                    closeModal(modalId);
+                    if(endpoint === '/login') {
+                        // يمكن هنا تغيير الأزرار لتظهر اسم المستخدم لاحقاً
+                        console.log("Logged in user:", result.username);
+                    }
+                }
+            } catch (err) {
+                alert("خطأ في الاتصال بالخادم");
+            }
+        }
+
+        // PWA
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js'); }
+
+        fetchWorks();
     </script>
 
 </body>
