@@ -13,23 +13,22 @@
         <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
         <a href="#"> الرئيسية</a>
-        <a href="#" onclick="document.getElementById('login-modal').classList.add('visible'); toggleMenu()"> تسجيل الدخول</a>
         <a href="#"> الأكثر مشاهدة</a>
         <a href="#"> أفلام</a>
         <a href="#"> مسلسلات</a>
+        <a href="#"> المفضلة</a>
     </div>
 
     <header class="navbar">
-        
         <div class="nav-left-section">
             <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
-          <div class="navbar-brand">
-                <img src="logo.png" alt="SHASHAFLIX Logo" class="navbar-logo-img">
+            <div class="navbar-brand">
+                <h1>SHASHAFLIX</h1>
             </div>
         </div>
 
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="بحث...">
+            <input type="text" id="search-input" class="search-input" placeholder="بحث عن فيلم أو مسلسل...">
         </div>
 
         <nav class="nav-links">
@@ -38,17 +37,19 @@
         </nav>
 
         <div class="nav-account">
-            <button class="btn btn-secondary" onclick="document.getElementById('login-modal').classList.add('visible')">دخول</button>
-            <button id="open-signup-btn" class="btn btn-primary">جديد</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('signup-modal').classList.add('visible')">دخول</button>
+            <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
         </div>
     </header>
 
     <section class="hero-section">
         <div class="hero-content">
-            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img">
-            <p>وصف قصير للعمل المميز...</p>
+            
+            <img src="logo.png" alt="SHASHAFLIX" class="hero-logo-img">
+            
+            <p>وصف قصير للعمل المميز في عدة أسطر لجذب انتباه المشاهد...</p>
             <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
-            <button class="btn btn-secondary" style="display:inline-block">معلومات</button>
+            <button class="btn btn-secondary">مزيد من المعلومات</button>
         </div>
     </section>
 
@@ -57,6 +58,7 @@
             <h2>أكمل المشاهدة</h2>
             <div class="row-posters" id="continue-watching-row"></div>
         </section>
+
         <section class="category-row">
             <h2>الأكثر مشاهدة</h2>
             <div class="row-posters" id="trending-row"></div>
@@ -65,73 +67,138 @@
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
-            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
+            <button id="close-modal-btn" class="close-btn">&times;</button>
             <h2>إنشاء حساب جديد</h2>
-            <form id="signup-form">
-                <div class="form-group"><label>الاسم</label><input type="text" id="username" required></div>
-                <div class="form-group"><label>الإيميل</label><input type="email" id="email" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" id="password" required></div>
-                <button type="submit" class="btn btn-primary" style="width:100%">إنشاء</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="login-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
-            <h2>تسجيل الدخول</h2>
-            <form id="login-form"> <div class="form-group"><label>الإيميل</label><input type="email" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" required></div>
-                <button type="submit" class="btn btn-primary" style="width:100%">دخول</button>
+            <form>
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary modal-btn">إنشاء الحساب</button>
             </form>
         </div>
     </div>
 
     <script>
-        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
-        
+        // 1. المتغيرات العامة
         const renderBaseUrl = 'https://shashaflix.onrender.com';
+        let allWorksData = []; // مخزن لحفظ كل الأفلام للبحث فيها
 
-        async function renderWorks() {
-            const row = document.getElementById('trending-row'); 
-            try {
-                const response = await fetch(`${renderBaseUrl}/api/works`);
-                if (!response.ok) throw new Error();
-                const data = await response.json();
-                row.innerHTML = '';
-                if (data.length === 0) { row.innerHTML = '<p style="color:#fff;padding:20px">لا توجد أعمال.</p>'; return; }
-                
-                data.forEach(work => {
-                    row.innerHTML += `
-                        <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
-                            <img src="${work.posterUrl}" alt="${work.title}">
-                            <div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div>
-                        </div>`;
-                });
-            } catch (e) { row.innerHTML = '<p style="color:red;padding:20px">خطأ في الاتصال</p>'; }
+        // وظيفة القائمة الجانبية
+        function toggleMenu() {
+            document.getElementById('mySidebar').classList.toggle('active');
         }
 
-        // تفعيل زر إنشاء حساب
-        document.getElementById('open-signup-btn').onclick = () => document.getElementById('signup-modal').classList.add('visible');
-        
-        // ربط نموذج التسجيل
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        const openBtn = document.getElementById('open-signup-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        const modal = document.getElementById('signup-modal');
+        const signupForm = document.querySelector('.modal-content form');
+        const searchInput = document.getElementById('search-input'); // متغير البحث
+
+        // 2. دالة جلب البيانات من الخادم
+        async function fetchWorks() {
+            const rowPostersContainer = document.getElementById('trending-row'); 
+            try {
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                if (!response.ok) throw new Error(`Status: ${response.status}`);
+                
+                // نحفظ البيانات في المتغير العام
+                allWorksData = await response.json();
+                
+                // نعرض البيانات كلها لأول مرة
+                displayMovies(allWorksData);
+
+            } catch (error) {
+                console.error('Error:', error);
+                rowPostersContainer.innerHTML = '<p style="color:red; margin: 20px;">جاري الاتصال بالسيرفر...</p>';
+            }
+        }
+
+        // 3. دالة عرض الأفلام (تستخدم للعرض الأولي وللبحث)
+        function displayMovies(moviesList) {
+            const rowPostersContainer = document.getElementById('trending-row');
+            rowPostersContainer.innerHTML = ''; // مسح المحتوى القديم
+
+            if (moviesList.length === 0) {
+                 rowPostersContainer.innerHTML = '<p style="color:white; margin: 20px;">لا توجد نتائج.</p>';
+                 return;
+            }
+
+            moviesList.forEach(work => {
+                const posterHTML = `
+                    <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
+                        <img src="${work.posterUrl || 'https://via.placeholder.com/200x300'}" alt="${work.title}">
+                        <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+                    </div>
+                `;
+                rowPostersContainer.innerHTML += posterHTML;
+            });
+        }
+
+        // 4. تفعيل البحث (عند الكتابة)
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase(); // النص الذي كتبه المستخدم
+            
+            // تصفية القائمة
+            const filteredMovies = allWorksData.filter(work => {
+                return work.title.toLowerCase().includes(searchTerm);
+            });
+
+            // عرض القائمة المصفاة
+            displayMovies(filteredMovies);
+        });
+
+        // 5. دالة التسجيل
+        signupForm.addEventListener('submit', function(event) {
+            event.preventDefault();
             const userData = {
                 username: document.getElementById('username').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
-            fetch(`${renderBaseUrl}/register`, {
-                method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(userData)
-            }).then(r => r.json()).then(d => { alert(d.message); document.getElementById('signup-modal').classList.remove('visible'); })
-              .catch(err => alert('فشل الاتصال'));
-        });
-        
-        // كود PWA
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js'); }
 
-        renderWorks();
+            fetch(`${renderBaseUrl}/register`, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData) 
+            })
+            .then(res => {
+                if (!res.ok) return res.json().then(err => { throw new Error(err.message); });
+                return res.json();
+            })
+            .then(data => {
+                alert(data.message);
+                modal.classList.remove('visible'); 
+            })
+            .catch(error => {
+                alert(`خطأ: ${error.message}`);
+            });
+        });
+
+        // إدارة النوافذ
+        openBtn.addEventListener('click', () => modal.classList.add('visible'));
+        closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
+        
+        // تشغيل كود PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js');
+            });
+        }
+
+        // بدء جلب البيانات
+        fetchWorks();
+
     </script>
+
 </body>
 </html>
