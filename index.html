@@ -14,7 +14,7 @@
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
         <a href="#">🏠 الرئيسية</a>
         <a href="#">🔥 الأكثر مشاهدة</a>
-        <a href="#">🎬 أفلام</a>
+        <a href="#">🆕 أحدث الإضافات</a>
         <a href="#">📺 مسلسلات</a>
     </div>
 
@@ -22,7 +22,7 @@
         <div class="nav-left-section">
             <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
             <div class="navbar-brand">
-                <h1>SHASHAFLIX</h1>
+                <img src="hero-logo.png" alt="SHASHAFLIX" class="navbar-logo-img">
             </div>
         </div>
 
@@ -36,78 +36,68 @@
         </nav>
 
         <div class="nav-account">
-            <button class="btn btn-secondary" onclick="openModal('login-modal')">دخول</button>
-            <button class="btn btn-primary" onclick="openModal('signup-modal')">حساب جديد</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('signup-modal').classList.add('visible')">دخول</button>
+            <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
         </div>
     </header>
 
     <section class="hero-section">
         <div class="hero-content">
-            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img" onerror="this.style.display='none';">
+            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img">
             <p>شاهد أفضل الأفلام والمسلسلات بجودة عالية.</p>
             <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
         </div>
     </section>
 
     <main class="content-rows">
+        
         <section class="category-row">
-            <h2 id="section-title">الأكثر مشاهدة</h2>
+            <h2>أكمل المشاهدة</h2>
+            <div class="row-posters" id="continue-watching-row">
+                <p style="color:gray; font-size:14px; padding:10px;">لا يوجد سجل مشاهدة حالياً.</p>
+            </div>
+        </section>
+
+        <section class="category-row">
+            <h2>الأكثر مشاهدة</h2>
             <div class="row-posters" id="trending-row"></div>
         </section>
+
+        <section class="category-row">
+            <h2 id="latest-title">أحدث الإضافات</h2>
+            <div class="row-posters" id="latest-row"></div>
+        </section>
+
     </main>
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('signup-modal')">&times;</button>
-            <h2>إنشاء حساب جديد</h2>
+            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
+            <h2>إنشاء حساب</h2>
             <form id="signup-form">
-                <div class="form-group"><label>الاسم</label><input type="text" id="reg-username" required></div>
-                <div class="form-group"><label>الإيميل</label><input type="email" id="reg-email" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" id="reg-password" required></div>
+                <div class="form-group"><input type="text" id="username" placeholder="الاسم" required></div>
+                <div class="form-group"><input type="email" id="email" placeholder="الإيميل" required></div>
+                <div class="form-group"><input type="password" id="password" placeholder="كلمة المرور" required></div>
                 <button type="submit" class="btn btn-primary" style="width:100%">تسجيل</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="login-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
-            <h2>تسجيل الدخول</h2>
-            <form id="login-form">
-                <div class="form-group"><label>الإيميل</label><input type="email" id="login-email" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" id="login-password" required></div>
-                <button type="submit" class="btn btn-primary" style="width:100%">دخول</button>
             </form>
         </div>
     </div>
 
     <script>
         const renderBaseUrl = 'https://shashaflix.onrender.com';
-        let allWorksData = [];
+        let allWorksData = []; 
 
-        // إدارة النوافذ
-        function openModal(id) { document.getElementById(id).classList.add('visible'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
-        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
-
-        // 1. جلب الأفلام
-        async function fetchWorks() {
-            const container = document.getElementById('trending-row');
-            try {
-                const response = await fetch(`${renderBaseUrl}/api/works`);
-                if (!response.ok) throw new Error();
-                allWorksData = await response.json();
-                displayMovies(allWorksData);
-            } catch (error) {
-                container.innerHTML = '<p style="color:red; padding:20px">جاري الاتصال بالخادم...</p>';
-            }
-        }
-
-        function displayMovies(movies) {
-            const container = document.getElementById('trending-row');
+        // دالة مساعدة لرسم البوسترات في أي صف
+        function drawPosters(data, containerId) {
+            const container = document.getElementById(containerId);
             container.innerHTML = '';
-            if (!movies.length) { container.innerHTML = '<p style="color:white; padding:20px">لا توجد نتائج.</p>'; return; }
-            movies.forEach(work => {
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p style="color:white; padding:20px">لا توجد بيانات.</p>';
+                return;
+            }
+
+            data.forEach(work => {
                 const img = work.posterUrl || 'https://via.placeholder.com/200x300';
                 container.innerHTML += `
                     <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
@@ -117,58 +107,56 @@
             });
         }
 
-        // 2. البحث
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase();
-            const filtered = allWorksData.filter(w => w.title && w.title.toLowerCase().includes(text));
-            displayMovies(text ? filtered : allWorksData);
-            document.getElementById('section-title').innerText = text ? "نتائج البحث" : "الأكثر مشاهدة";
-        });
-
-        // 3. إنشاء حساب (Register)
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                username: document.getElementById('reg-username').value,
-                email: document.getElementById('reg-email').value,
-                password: document.getElementById('reg-password').value
-            };
-            sendAuthRequest('/register', data, 'signup-modal');
-        });
-
-        // 4. تسجيل الدخول (Login) - جديد
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                email: document.getElementById('login-email').value,
-                password: document.getElementById('login-password').value
-            };
-            sendAuthRequest('/login', data, 'login-modal');
-        });
-
-        // دالة مساعدة للإرسال
-        async function sendAuthRequest(endpoint, data, modalId) {
+        // دالة جلب البيانات وتوزيعها
+        async function fetchWorks() {
             try {
-                const res = await fetch(`${renderBaseUrl}${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await res.json();
-                alert(result.message);
-                if (res.ok) {
-                    closeModal(modalId);
-                    if(endpoint === '/login') {
-                        // يمكن هنا تغيير الأزرار لتظهر اسم المستخدم لاحقاً
-                        console.log("Logged in user:", result.username);
-                    }
-                }
-            } catch (err) {
-                alert("خطأ في الاتصال بالخادم");
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                
+                allWorksData = data; // حفظ نسخة للبحث
+
+                // 1. تعبئة "الأكثر مشاهدة" (أول 7 فقط)
+                const trendingMovies = data.slice(0, 7); 
+                drawPosters(trendingMovies, 'trending-row');
+
+                // 2. تعبئة "أحدث الإضافات" (الكل)
+                drawPosters(data, 'latest-row');
+
+            } catch (error) {
+                console.error(error);
             }
         }
 
-        // PWA
+        // البحث (يصفي قسم أحدث الإضافات)
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            const filtered = allWorksData.filter(w => w.title && w.title.toLowerCase().includes(text));
+            
+            // نحدث قسم "أحدث الإضافات" فقط كنتائج بحث
+            drawPosters(filtered, 'latest-row');
+            
+            // تغيير العنوان
+            document.getElementById('latest-title').innerText = text ? "نتائج البحث" : "أحدث الإضافات";
+        });
+
+        // دوال المساعدة
+        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
+        document.getElementById('open-signup-btn').onclick = () => document.getElementById('signup-modal').classList.add('visible');
+        
+        // تسجيل (وهمي للواجهة)
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            fetch(`${renderBaseUrl}/register`, {
+                method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(userData)
+            }).then(r => r.json()).then(d => { alert(d.message); document.getElementById('signup-modal').classList.remove('visible'); });
+        });
+
         if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js'); }
 
         fetchWorks();
