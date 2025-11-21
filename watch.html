@@ -8,25 +8,49 @@
     <style>
         body { overflow-x: hidden; }
         .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
-        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; }
-        .video-wrapper { position: relative; width: 100%; height: 100%; }
-        .video-player { width: 100%; height: 100%; border: none; }
+        
+        /* قسم الفيديو والسيرفرات */
+        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; /* 16:9 Aspect Ratio */ }
+        .video-player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        /* تصميم أزرار السيرفرات */
+        .servers-list { padding: 15px; background: #111; border-bottom: 1px solid #333; display: flex; gap: 10px; overflow-x: auto; align-items: center; }
+        .server-label { color: #fff; margin-left: 10px; font-weight: bold; }
+        .server-btn { 
+            padding: 8px 15px; 
+            background: #333; 
+            color: white; 
+            border: 1px solid #555; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .server-btn:hover, .server-btn.active { background: var(--primary-color); color: black; border-color: var(--primary-color); }
+
+        /* القائمة الجانبية */
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
         .season-selector { padding: 20px; background: #141414; }
-        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; font-size: 16px; }
+        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; }
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
-        .episode-item:hover { background: #333; }
-        .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
+        .episode-item { display: flex; padding: 10px; margin-bottom: 10px; background: #2a2a2a; border-radius: 5px; cursor: pointer; }
+        .episode-item:hover, .episode-item.active { background: #00BFFF; color: black; }
         .episode-info h4 { margin: 0; font-size: 14px; }
-        @media (max-width: 768px) { .watch-container { height: auto; flex-direction: column; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
+
+        /* للموبايل */
+        @media (max-width: 768px) {
+            .watch-container { height: auto; flex-direction: column; }
+            .main-content { height: auto; }
+            .episodes-section { height: 500px; }
+        }
     </style>
 </head>
 <body>
 
     <header class="navbar">
         <div class="navbar-brand">
-            <img src="logo.png" alt="SHASHAFLIX" style="height: 40px; vertical-align: middle;">
+            <img src="hero-logo.png" alt="SHASHAFLIX" style="height: 40px; vertical-align: middle;">
         </div>
         <div class="nav-account"><a href="index.html" class="btn btn-secondary">➜ عودة</a></div>
     </header>
@@ -34,95 +58,126 @@
     <div class="watch-container">
         <div class="main-content">
             <div class="video-wrapper">
-                <iframe id="main-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <iframe id="main-player" class="video-player" src="" allowfullscreen></iframe>
+            </div>
+            <div class="servers-list" id="servers-container">
+                <span class="server-label">السيرفرات:</span>
+                <span style="color:gray; font-size:12px;">اختر حلقة أولاً</span>
             </div>
         </div>
+
         <div class="episodes-section">
             <div class="season-selector">
-                <select id="season-select"></select>
+                <select id="season-select" onchange="changeSeason(this.value)"></select>
             </div>
-            <div class="episodes-list" id="episodes-container">
-                <p style="color:white; text-align:center; padding:20px;">جاري التحميل...</p>
-            </div>
+            <div class="episodes-list" id="episodes-container"></div>
         </div>
     </div>
 
     <script>
-        // رابط السيرفر
-        const renderBaseUrl = 'https://shashaflix.onrender.com';
+        // ====================================================
+        // 🟢 منطقة البيانات: لاحظ كيف نضع السيرفرات الآن
+        // ====================================================
+        
+        const allSeries = {
+            // يجب أن يكون الاسم هنا هو نفس ID المسلسل في فايربيس
+            "Boku No Hero": { 
+                "1": [ // الموسم 1
+                    { 
+                        title: "الحلقة 1: البداية", 
+                        // قائمة السيرفرات لهذه الحلقة
+                        servers: [
+                            { name: "سيرفر 1 (رئيسي)", url: "https://www.youtube.com/embed/DkLjq4C_k8c" },
+                            { name: "سيرفر 2 (احتياطي)", url: "https://www.youtube.com/embed/VIDEO_ID_2" },
+                            { name: "سيرفر 4K", url: "https://www.youtube.com/embed/VIDEO_ID_3" }
+                        ]
+                    },
+                    { 
+                        title: "الحلقة 2: الأبطال", 
+                        servers: [
+                            { name: "سيرفر سريع", url: "https://www.youtube.com/embed/VIDEO_ID_4" }
+                        ]
+                    }
+                ],
+                "2": [ // الموسم 2
+                    { 
+                        title: "الحلقة 1", 
+                        servers: [
+                            { name: "سيرفر مشاهدة", url: "https://www.youtube.com/embed/..." }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // ====================================================
+        // 🛑 المنطق البرمجي
+        // ====================================================
 
         const urlParams = new URLSearchParams(window.location.search);
-        const seriesId = urlParams.get('id');
-        
+        const seriesId = urlParams.get('id'); 
         const player = document.getElementById('main-player');
         const episodesContainer = document.getElementById('episodes-container');
+        const serversContainer = document.getElementById('servers-container');
         const seasonSelect = document.getElementById('season-select');
-        
-        let currentSeasonsData = {}; 
 
-        async function fetchSeriesData() {
-            try {
-                const response = await fetch(`${renderBaseUrl}/api/works`);
-                const works = await response.json();
-                
-                // البحث عن المسلسل بالـ ID
-                const currentWork = works.find(work => work.id === seriesId);
+        let currentSeriesData = allSeries[seriesId];
 
-                // هنا التغيير: نقرأ حقل "seasons" مباشرة ككائن (Object) وليس كنص
-                if (currentWork && currentWork.seasons) {
-                    currentSeasonsData = currentWork.seasons;
-                    initSeasons();
-                } else {
-                    episodesContainer.innerHTML = "<p style='color:white; padding:20px; text-align:center;'>لا توجد حلقات مضافة لهذا العمل.</p>";
-                }
-            } catch (error) {
-                console.error(error);
-                episodesContainer.innerHTML = "<p style='color:red; padding:20px; text-align:center;'>خطأ في الاتصال.</p>";
-            }
-        }
-
-        function initSeasons() {
-            const seasonKeys = Object.keys(currentSeasonsData);
-            seasonSelect.innerHTML = "";
-            
-            seasonKeys.forEach(s => {
+        if (currentSeriesData) {
+            const seasons = Object.keys(currentSeriesData);
+            seasons.forEach(s => {
                 seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
             });
-
-            seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
-
-            if (seasonKeys.length > 0) {
-                loadEpisodes(seasonKeys[0]);
-            }
+            changeSeason(seasons[0]);
+        } else {
+            episodesContainer.innerHTML = "<p style='color:white; padding:20px'>الحلقات غير متوفرة حالياً أو الـ ID غير مطابق.</p>";
         }
 
-        function loadEpisodes(seasonKey) {
+        function changeSeason(season) {
             episodesContainer.innerHTML = "";
-            const episodes = currentSeasonsData[seasonKey];
-
-            if (episodes && episodes.length > 0) {
-                episodes.forEach((ep) => {
-                    const div = document.createElement('div');
-                    div.className = 'episode-item';
-                    div.innerHTML = `<div class="episode-info"><h4>${ep.title}</h4></div>`;
+            const episodes = currentSeriesData[season];
+            
+            episodes.forEach((ep, index) => {
+                const div = document.createElement('div');
+                div.className = 'episode-item';
+                div.innerHTML = `<div class="episode-info"><h4>${ep.title}</h4></div>`;
+                
+                div.onclick = () => {
+                    // 1. تحديد الحلقة النشطة
+                    document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+                    div.classList.add('active');
                     
-                    div.onclick = () => {
-                        player.src = ep.url;
-                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
-                        div.classList.add('active');
-                    };
-                    episodesContainer.appendChild(div);
-                });
-                // تشغيل الحلقة الأولى
-                player.src = episodes[0].url;
-                episodesContainer.children[0].classList.add('active');
-            } else {
-                episodesContainer.innerHTML = "<p style='color:gray; text-align:center;'>لا توجد حلقات.</p>";
+                    // 2. عرض سيرفرات هذه الحلقة
+                    loadServers(ep.servers);
+                };
+                episodesContainer.appendChild(div);
+            });
+
+            // تشغيل الحلقة الأولى تلقائياً
+            if(episodes.length > 0) {
+                episodesContainer.children[0].click();
             }
         }
 
-        if (seriesId) {
-            fetchSeriesData();
+        function loadServers(servers) {
+            serversContainer.innerHTML = '<span class="server-label">السيرفرات:</span>';
+            
+            servers.forEach((server, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'server-btn';
+                btn.innerText = server.name;
+                
+                btn.onclick = () => {
+                    player.src = server.url;
+                    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+
+                serversContainer.appendChild(btn);
+
+                // تشغيل السيرفر الأول تلقائياً
+                if(index === 0) btn.click();
+            });
         }
     </script>
 
