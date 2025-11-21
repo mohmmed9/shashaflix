@@ -13,6 +13,7 @@
         <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
         <a href="#">🏠 الرئيسية</a>
+        <a href="#" onclick="openModal('login-modal'); toggleMenu()">👤 تسجيل الدخول</a>
         <a href="#">🔥 الأكثر مشاهدة</a>
         <a href="#">🆕 أحدث الإضافات</a>
         <a href="#">📺 مسلسلات</a>
@@ -36,8 +37,8 @@
         </nav>
 
         <div class="nav-account">
-            <button class="btn btn-secondary" onclick="document.getElementById('signup-modal').classList.add('visible')">دخول</button>
-            <button id="open-signup-btn" class="btn btn-primary">حساب جديد</button>
+            <button class="btn btn-secondary" onclick="openModal('login-modal')">دخول</button>
+            <button id="open-signup-btn" class="btn btn-primary" onclick="openModal('signup-modal')">حساب جديد</button>
         </div>
     </header>
 
@@ -52,33 +53,45 @@
     <main class="content-rows">
         
         <section class="category-row">
-            <h2>أكمل المشاهدة</h2>
-            <div class="row-posters" id="continue-watching-row">
-                <p style="color:gray; font-size:14px; padding:10px;">لا يوجد سجل مشاهدة حالياً.</p>
-            </div>
-        </section>
-
-        <section class="category-row">
             <h2>الأكثر مشاهدة</h2>
             <div class="row-posters" id="trending-row"></div>
         </section>
 
         <section class="category-row">
             <h2 id="latest-title">أحدث الإضافات</h2>
-        <div class="grid-posters" id="latest-row"></div>
+            <div class="grid-posters" id="latest-row"></div>
+        </section>
+
+        <section class="category-row">
+            <h2>أكمل المشاهدة</h2>
+            <div class="row-posters" id="continue-watching-row">
+                <p style="color:gray; font-size:14px; padding:10px;">لا يوجد سجل مشاهدة حالياً.</p>
+            </div>
         </section>
 
     </main>
 
     <div id="signup-modal" class="modal-overlay">
         <div class="modal-content">
-            <button class="close-btn" onclick="this.parentElement.parentElement.classList.remove('visible')">&times;</button>
+            <button class="close-btn" onclick="closeModal('signup-modal')">&times;</button>
             <h2>إنشاء حساب</h2>
             <form id="signup-form">
-                <div class="form-group"><input type="text" id="username" placeholder="الاسم" required></div>
-                <div class="form-group"><input type="email" id="email" placeholder="الإيميل" required></div>
-                <div class="form-group"><input type="password" id="password" placeholder="كلمة المرور" required></div>
+                <div class="form-group"><input type="text" id="reg-username" placeholder="الاسم" required></div>
+                <div class="form-group"><input type="email" id="reg-email" placeholder="الإيميل" required></div>
+                <div class="form-group"><input type="password" id="reg-password" placeholder="كلمة المرور" required></div>
                 <button type="submit" class="btn btn-primary" style="width:100%">تسجيل</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
+            <h2>تسجيل الدخول</h2>
+            <form id="login-form">
+                <div class="form-group"><input type="email" id="login-email" placeholder="الإيميل" required></div>
+                <div class="form-group"><input type="password" id="login-password" placeholder="كلمة المرور" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">دخول</button>
             </form>
         </div>
     </div>
@@ -87,7 +100,7 @@
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         let allWorksData = []; 
 
-        // دالة مساعدة لرسم البوسترات في أي صف
+        // دالة لرسم البوسترات (تستخدم لكلا القسمين)
         function drawPosters(data, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -107,20 +120,20 @@
             });
         }
 
-        // دالة جلب البيانات وتوزيعها
+        // جلب البيانات وتوزيعها
         async function fetchWorks() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
                 if (!response.ok) throw new Error();
                 const data = await response.json();
                 
-                allWorksData = data; // حفظ نسخة للبحث
+                allWorksData = data;
 
-                // 1. تعبئة "الأكثر مشاهدة" (أول 7 فقط)
+                // 1. الأكثر مشاهدة: نأخذ أول 7 فقط
                 const trendingMovies = data.slice(0, 7); 
                 drawPosters(trendingMovies, 'trending-row');
 
-                // 2. تعبئة "أحدث الإضافات" (الكل)
+                // 2. أحدث الإضافات: نعرض الكل
                 drawPosters(data, 'latest-row');
 
             } catch (error) {
@@ -128,33 +141,50 @@
             }
         }
 
-        // البحث (يصفي قسم أحدث الإضافات)
+        // البحث
         document.getElementById('search-input').addEventListener('input', (e) => {
             const text = e.target.value.toLowerCase();
             const filtered = allWorksData.filter(w => w.title && w.title.toLowerCase().includes(text));
             
-            // نحدث قسم "أحدث الإضافات" فقط كنتائج بحث
+            // نحدث الشبكة (أحدث الإضافات) بنتائج البحث
             drawPosters(filtered, 'latest-row');
-            
-            // تغيير العنوان
             document.getElementById('latest-title').innerText = text ? "نتائج البحث" : "أحدث الإضافات";
         });
 
-        // دوال المساعدة
+        // دوال مساعدة
         function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
-        document.getElementById('open-signup-btn').onclick = () => document.getElementById('signup-modal').classList.add('visible');
-        
-        // تسجيل (وهمي للواجهة)
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
+        function openModal(id) { document.getElementById(id).classList.add('visible'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
+
+        // ربط النماذج بالخادم
+        async function handleAuth(endpoint, data, modalId) {
+            try {
+                const res = await fetch(`${renderBaseUrl}${endpoint}`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (res.ok) closeModal(modalId);
+            } catch (e) { alert('فشل الاتصال'); }
+        }
+
+        document.getElementById('signup-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const userData = {
-                username: document.getElementById('username').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
+            const data = {
+                username: document.getElementById('reg-username').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
             };
-            fetch(`${renderBaseUrl}/register`, {
-                method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(userData)
-            }).then(r => r.json()).then(d => { alert(d.message); document.getElementById('signup-modal').classList.remove('visible'); });
+            handleAuth('/register', data, 'signup-modal');
+        });
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+            handleAuth('/login', data, 'login-modal');
         });
 
         if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js'); }
