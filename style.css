@@ -18,7 +18,7 @@ body {
     overflow-x: hidden;
 }
 
-/* === 1. الشريط العلوي (Navbar) === */
+/* === 1. الشريط العلوي === */
 .navbar {
     display: flex;
     align-items: center;
@@ -31,10 +31,9 @@ body {
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
-    height: 60px; /* ارتفاع ثابت للشريط */
+    height: 60px;
 }
 
-/* القسم الأيمن: القائمة والشعار */
 .nav-left-section {
     display: flex;
     align-items: center;
@@ -53,30 +52,15 @@ body {
     align-items: center;
 }
 
-.navbar-brand h1 {
-    color: var(--primary-color);
-    margin: 0;
-    font-size: 20px; /* تصغير قليل للموبايل */
-    font-weight: bold;
-}
-/* تنسيق شعار SHASHAFLIX في الشريط العلوي */
 .navbar-logo-img {
-    height: 40px; /* تحديد ارتفاع مناسب */
-    width: auto; /* الحفاظ على نسبة العرض إلى الارتفاع */
-    vertical-align: middle; /* لمحاذاة جيدة مع بقية العناصر */
+    height: 35px;
+    width: auto;
+    vertical-align: middle;
 }
 
-/* في الموبايل، قد تحتاج لتصغيره أكثر قليلاً */
-@media (max-width: 768px) {
-    .navbar-logo-img {
-        height: 30px; /* تصغير في الموبايل */
-    }
-}
-
-/* القسم الأوسط: شريط البحث */
 .search-container {
     flex-grow: 1;
-    margin: 0 10px;
+    margin: 0 15px;
     display: flex;
     justify-content: center;
 }
@@ -98,11 +82,10 @@ body {
     background-color: #2a2a2a;
 }
 
-/* الروابط (سطح المكتب فقط) */
 .nav-links {
     display: flex;
     gap: 15px;
-    display: none; /* مخفية افتراضياً، تظهر في الشاشات الكبيرة */
+    display: none;
 }
 
 .nav-links a {
@@ -112,15 +95,13 @@ body {
     font-size: 14px;
 }
 
-/* القسم الأيسر: أزرار الحساب */
 .nav-account {
     display: flex;
     align-items: center;
-    gap: 5px; /* مسافة بين زر دخول وزر تسجيل */
+    gap: 8px;
     flex-shrink: 0;
 }
 
-/* تنسيق الأزرار */
 .btn {
     border: none;
     padding: 6px 12px;
@@ -131,16 +112,8 @@ body {
     white-space: nowrap;
 }
 
-.btn-primary {
-    background-color: var(--primary-color);
-    color: black;
-}
-
-.btn-secondary {
-    background-color: transparent;
-    color: white;
-    border: 1px solid #555;
-}
+.btn-primary { background-color: var(--primary-color); color: black; }
+.btn-secondary { background-color: transparent; color: white; border: 1px solid #555; }
 
 /* === القائمة الجانبية === */
 .sidebar {
@@ -157,9 +130,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 .sidebar.active { right: 0; }
-
 .sidebar a {
     padding: 15px 20px;
     text-decoration: none;
@@ -167,7 +138,6 @@ body {
     color: #e0e0e0;
     border-bottom: 1px solid #222;
 }
-
 .close-sidebar-btn {
     position: absolute;
     top: 10px;
@@ -179,7 +149,7 @@ body {
     cursor: pointer;
 }
 
-/* === بقية التنسيقات (Hero, Rows, Modals) === */
+/* === Hero === */
 .hero-section {
     height: 60vh;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.6), var(--background-color)), url('https://via.placeholder.com/1500x500?text=Hero');
@@ -190,20 +160,72 @@ body {
     padding: 0 20px;
     padding-top: 60px;
 }
-
 .hero-content { max-width: 500px; width: 100%; }
 .hero-logo-img { max-width: 250px; width: 70%; margin-bottom: 10px; display: block; }
 
+/* === تنسيق الصفوف والبوسترات (تم الإصلاح هنا) === */
 .content-rows { padding: 20px; }
-.row-posters { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; }
+
+/* تقليل المسافة تحت العنوان */
+.category-row h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    margin-top: 0;
+    color: #fff;
+}
+
+/* صف التمرير الأفقي (الأكثر مشاهدة) */
+.row-posters {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px; /* مسافة صغيرة جداً بين الصور */
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
 .row-posters::-webkit-scrollbar { display: none; }
 
-.poster-container { position: relative; flex-shrink: 0; cursor: pointer; }
-.poster-container img { width: 140px; height: 210px; border-radius: 6px; object-fit: cover; }
+/* شبكة العرض (أحدث الإضافات) - 7 أعمدة */
+.grid-posters {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 أعمدة */
+    gap: 10px; /* مسافة صغيرة بين الشبكة */
+    padding-bottom: 40px;
+}
+
+/* حاوية البوستر */
+.poster-container {
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin: 0; /* إزالة أي هوامش خارجية */
+}
+
+.poster-container:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+/* الصور */
+.poster-container img {
+    width: 100%; /* تملأ الحاوية */
+    height: auto;
+    aspect-ratio: 2/3; /* الحفاظ على شكل البوستر */
+    border-radius: 6px;
+    object-fit: cover;
+    display: block;
+}
+
+/* تحديد حجم ثابت لصور الصف الأفقي فقط */
+.row-posters .poster-container {
+    width: 150px; /* عرض ثابت للصف الأفقي */
+}
+
+/* شريط التقدم */
 .progress-bar { width: 90%; height: 3px; background: rgba(255,255,255,0.3); position: absolute; bottom: 8px; left: 5%; border-radius: 2px; }
 .progress-fill { height: 100%; background-color: var(--primary-color); }
 
-/* النوافذ المنبثقة */
+/* النوافذ */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: 0.3s; }
 .modal-overlay.visible { visibility: visible; opacity: 1; }
 .modal-content { background: #1f1f1f; padding: 25px; border-radius: 8px; width: 90%; max-width: 350px; position: relative; }
@@ -212,50 +234,13 @@ body {
 .form-group input { width: 100%; padding: 10px; border: 1px solid #444; background: #333; color: #fff; border-radius: 4px; box-sizing: border-box; }
 .close-btn { position: absolute; top: 10px; left: 15px; font-size: 24px; color: #aaa; background: none; border: none; cursor: pointer; }
 
-/* === التجاوب (Media Queries) === */
+/* === التجاوب === */
 @media (min-width: 769px) {
-    .nav-links { display: flex; } /* إظهار الروابط في الشاشات الكبيرة */
-    .navbar-brand h1 { font-size: 24px; }
-    .poster-container img { width: 180px; height: 270px; }
+    .nav-links { display: flex; }
+    /* تكبير الصور قليلاً في الشاشات الكبيرة */
+    .row-posters .poster-container { width: 180px; }
 }
 
-@media (max-width: 768px) {
-    /* تعديلات خاصة للموبايل لضمان ظهور البحث */
-    .nav-links { display: none; }
- 
-    
-    .search-container { 
-        margin: 0 10px; 
-        flex-grow: 1; /* جعل البحث يأخذ كل المساحة المتاحة */
-    }
-    
-    .btn-secondary { display: none; } /* إخفاء زر "دخول" في الموبايل إذا كانت الشاشة ضيقة جداً، أو تركه */
-    
-    /* إذا أردت إظهار "دخول" في الموبايل، قم بإزالة السطر السابق، لكن قد يضيق البحث */
-}
-/* === تنسيق الشبكة (لأحدث الإضافات) === */
-.grid-posters {
-    display: grid;
-    /* هنا نحدد 7 أعمدة متساوية */
-    grid-template-columns: repeat(7, 1fr); 
-    gap: 15px; /* مسافة بين البوسترات */
-    padding-bottom: 40px;
-}
-
-/* تعديل البوسترات داخل الشبكة لتتأقلم مع الحجم */
-.grid-posters .poster-container {
-    width: 100%; /* تأخذ عرض الخانة بالكامل */
-    margin: 0;
-}
-
-.grid-posters .poster-container img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 2/3; /* للحفاظ على شكل البوستر الطولي */
-}
-
-/* === التجاوب مع الشاشات الأصغر (مهم جداً) === */
-/* على اللابتوب الصغير أو التابلت نعرض 5 أو 4 */
 @media (max-width: 1200px) {
     .grid-posters { grid-template-columns: repeat(5, 1fr); }
 }
@@ -264,7 +249,9 @@ body {
     .grid-posters { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* على الموبايل نعرض 3 أو 2 فقط لتكون واضحة */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    .nav-links { display: none; }
     .grid-posters { grid-template-columns: repeat(3, 1fr); }
+    .row-posters .poster-container { width: 130px; }
+    .hero-logo-img { width: 80%; }
 }
