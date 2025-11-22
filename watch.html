@@ -5,187 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مشاهدة - SHASHAFLIX</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         body { overflow-x: hidden; background-color: #000; }
-        
         .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
         
-        /* قسم الفيديو */
-        .main-content { 
-            flex: 3; 
-            background: #000; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            position: relative; 
-        }
-        
-        .video-wrapper { 
-            position: relative; 
-            width: 100%; 
-            height: 100%; 
-            background: #000;
-            flex-grow: 1;
-        }
-        
-        /* المشغلات */
-        .video-player { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-        }
+        /* الفيديو */
+        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .video-wrapper { position: relative; width: 100%; height: 100%; }
+        .video-player { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
 
-        /* === شريط التحكم (التالي والسابق) === */
-        .controls-bar {
-            background-color: #111;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #333;
-        }
-
-        .nav-btn {
-            background-color: #333;
-            color: white;
-            border: 1px solid #555;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-btn:hover { background-color: var(--primary-color); color: black; border-color: var(--primary-color); }
-        
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #222;
-            color: #555;
-            border-color: #333;
-        }
-
-        /* القائمة الجانبية */
+        /* القائمة */
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
-        .season-selector { padding: 20px; background: #141414; border-bottom: 1px solid #333; }
-        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; outline: none; }
+        .season-selector { padding: 20px; background: #141414; }
+        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; }
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        
-        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
+        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; align-items: center; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
-        .episode-info h4 { margin: 0; font-size: 14px; }
-        
         .status-msg { color: white; text-align: center; padding: 20px; margin-top: 50px; }
-        
-        @media (max-width: 768px) { 
-            .watch-container { height: auto; flex-direction: column; } 
-            .main-content { height: auto; min-height: 40vh; } 
-            .video-wrapper { height: 56.25vw; }
-            .episodes-section { height: 60vh; } 
+
+        /* زر التخطي */
+        #skip-intro-btn {
+            position: absolute; bottom: 80px; right: 30px;
+            background: rgba(0,0,0,0.7); color: white; border: 1px solid white;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 20; display: none;
         }
+
+        @media (max-width: 768px) { .watch-container { height: auto; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
     </style>
 </head>
 <body>
 
     <header class="navbar">
-        <div class="navbar-brand">
-            <img src="hero-logo.png" alt="SHASHAFLIX" style="height: 40px; vertical-align: middle;">
-        </div>
-        <div class="nav-account"><a href="index.html" class="btn btn-secondary">➜ عودة</a></div>
+        <div class="navbar-brand"><img src="hero-logo.png" style="height:40px;"></div>
+        <div class="nav-account"><a href="index.html" class="btn btn-secondary">عودة</a></div>
     </header>
 
     <div class="watch-container">
         <div class="main-content">
             <div class="video-wrapper">
-                <iframe id="iframe-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                
-                <video id="mp4-player" class="video-player" controls playsinline style="display: none;">
-                    متصفحك لا يدعم تشغيل الفيديو.
-                </video>
-            </div>
-
-            <div class="controls-bar">
-                <button id="prev-btn" class="nav-btn" onclick="playPrevious()">
-                    ⏭ الحلقة السابقة
-                </button>
-                <span style="color: #aaa; font-size: 14px;" id="episode-counter"></span>
-                <button id="next-btn" class="nav-btn" onclick="playNext()">
-                    الحلقة التالية ⏮
-                </button>
+                <video id="player" class="video-player" playsinline controls></video>
+                <button id="skip-intro-btn" onclick="skipIntro()">تخطي المقدمة ⏭</button>
             </div>
         </div>
 
         <div class="episodes-section">
-            <div class="season-selector">
-                <select id="season-select"></select>
-            </div>
+            <div class="season-selector"><select id="season-select"></select></div>
             <div class="episodes-list" id="episodes-container">
                 <p class="status-msg">جاري التحميل...</p>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
+        // ==========================================
+        // 🔑 ضع مفتاح API الخاص بك هنا
+        // ==========================================
+        const GOOGLE_API_KEY = "AIzaSyA1lndptjt3BP1PjDg2IrM5Y8Y7kfgNzck"; 
+        // ==========================================
+
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
         
-        // عناصر الصفحة
-        const iframePlayer = document.getElementById('iframe-player');
-        const mp4Player = document.getElementById('mp4-player');
-        const episodesContainer = document.getElementById('episodes-container');
-        const seasonSelect = document.getElementById('season-select');
-        const nextBtn = document.getElementById('next-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const episodeCounter = document.getElementById('episode-counter');
-        
+        const player = new Plyr('#player');
+        const skipBtn = document.getElementById('skip-intro-btn');
         let currentSeasonsData = {}; 
-        let currentSeasonKey = "1";
-        let currentEpisodeIndex = 0;
 
-        // === دالة ذكية لتشغيل الفيديو (تدعم جوجل درايف + MP4) ===
+        // === الوظيفة السحرية لتحويل الرابط ===
         function playVideo(url) {
-            const isMp4 = url.includes('.mp4') || url.includes('.mkv');
-            const isGoogleDrive = url.includes('drive.google.com');
+            let directUrl = url;
 
-            // 1. إذا كان ملف مباشر (MP4)
-            if (isMp4) {
-                iframePlayer.style.display = 'none';
-                iframePlayer.src = "";
-                mp4Player.style.display = 'block';
-                mp4Player.src = url;
-                mp4Player.play();
-            } 
-            // 2. إذا كان جوجل درايف أو يوتيوب (Iframe)
-            else {
-                mp4Player.style.display = 'none';
-                mp4Player.pause();
-                iframePlayer.style.display = 'block';
-                
-                let finalUrl = url;
-
-                // معالجة رابط جوجل درايف ليصبح قابلاً للتضمين
-                if (isGoogleDrive) {
-                    finalUrl = url.replace('/view', '/preview').replace('/usp=sharing', '');
-                } 
-                // معالجة التشغيل التلقائي لباقي الروابط
-                else {
-                    finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+            // إذا كان الرابط من جوجل درايف
+            if (url.includes('drive.google.com')) {
+                try {
+                    // 1. استخراج ID الملف
+                    const fileId = url.match(/\/d\/(.+?)\//)[1];
+                    
+                    // 2. تحويله إلى رابط API مباشر
+                    // هذا الرابط يعطي الفيديو "خام" (Stream) وليس صفحة ويب
+                    directUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${GOOGLE_API_KEY}`;
+                    
+                } catch (e) {
+                    console.error("خطأ في رابط جوجل درايف", e);
                 }
-
-                iframePlayer.src = finalUrl;
             }
+
+            // تشغيل الرابط في المشغل الاحترافي
+            player.source = {
+                type: 'video',
+                sources: [
+                    { src: directUrl, type: 'video/mp4' }
+                ]
+            };
+            player.play();
         }
 
-        // === جلب البيانات من الخادم ===
+        // تخطي المقدمة
+        function skipIntro() { player.forward(85); skipBtn.style.display = 'none'; }
+        player.on('timeupdate', () => {
+            if (player.currentTime > 0 && player.currentTime < 120) skipBtn.style.display = 'block';
+            else skipBtn.style.display = 'none';
+        });
+
+        // جلب البيانات (نفس الكود السابق)
         async function fetchSeriesData() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
@@ -196,105 +121,43 @@
                     currentSeasonsData = currentWork.seasons;
                     initSeasons();
                 } else {
-                    episodesContainer.innerHTML = "<p class='status-msg'>لا توجد حلقات مضافة.</p>";
+                    document.getElementById('episodes-container').innerHTML = "<p class='status-msg'>لا توجد حلقات.</p>";
                 }
-            } catch (error) {
-                console.error(error);
-                episodesContainer.innerHTML = "<p class='status-msg' style='color:red;'>خطأ في الاتصال.</p>";
-            }
+            } catch (error) { console.error(error); }
         }
 
         function initSeasons() {
             const seasonKeys = Object.keys(currentSeasonsData);
-            seasonSelect.innerHTML = "";
-            
-            seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
-
-            seasonKeys.forEach(s => {
-                seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
-            });
-
-            seasonSelect.onchange = () => {
-                currentSeasonKey = seasonSelect.value;
-                loadEpisodes(currentSeasonKey);
-            };
-
-            if (seasonKeys.length > 0) {
-                currentSeasonKey = seasonKeys[0];
-                loadEpisodes(currentSeasonKey);
-            }
+            const select = document.getElementById('season-select');
+            select.innerHTML = "";
+            seasonKeys.sort().forEach(s => select.innerHTML += `<option value="${s}">الموسم ${s}</option>`);
+            select.onchange = () => loadEpisodes(select.value);
+            if (seasonKeys.length > 0) loadEpisodes(seasonKeys[0]);
         }
 
         function loadEpisodes(seasonKey) {
-            episodesContainer.innerHTML = "";
-            const episodeLinks = currentSeasonsData[seasonKey]; 
+            const container = document.getElementById('episodes-container');
+            container.innerHTML = "";
+            const episodes = currentSeasonsData[seasonKey];
 
-            if (episodeLinks && episodeLinks.length > 0) {
-                episodeLinks.forEach((url, index) => {
+            if (episodes && episodes.length > 0) {
+                episodes.forEach((ep, index) => {
                     const div = document.createElement('div');
                     div.className = 'episode-item';
-                    div.id = `ep-${index}`;
-                    
                     div.innerHTML = `<div class="episode-info"><h4>الحلقة ${index + 1}</h4></div>`;
                     
                     div.onclick = () => {
-                        playEpisodeByIndex(index);
+                        playVideo(ep.url);
+                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+                        div.classList.add('active');
                     };
-                    episodesContainer.appendChild(div);
+                    container.appendChild(div);
                 });
-                
-                // تشغيل الحلقة الأولى
-                playEpisodeByIndex(0);
-            } else {
-                episodesContainer.innerHTML = "<p class='status-msg'>لا توجد روابط.</p>";
-                updateControls(0, 0);
+                container.children[0].click();
             }
         }
 
-        // === التحكم في التشغيل والتنقل ===
-        function playEpisodeByIndex(index) {
-            const episodeLinks = currentSeasonsData[currentSeasonKey];
-            if (!episodeLinks || !episodeLinks[index]) return;
-
-            currentEpisodeIndex = index;
-            
-            // تشغيل الفيديو
-            playVideo(episodeLinks[index]);
-
-            // تحديث القائمة الجانبية
-            document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
-            const activeItem = document.getElementById(`ep-${index}`);
-            if (activeItem) {
-                activeItem.classList.add('active');
-                activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            // تحديث الأزرار
-            updateControls(index, episodeLinks.length);
-        }
-
-        function updateControls(currentIndex, totalEpisodes) {
-            episodeCounter.innerText = `الحلقة ${currentIndex + 1} من ${totalEpisodes}`;
-            prevBtn.disabled = (currentIndex === 0);
-            nextBtn.disabled = (currentIndex === totalEpisodes - 1);
-        }
-
-        function playNext() {
-            const episodeLinks = currentSeasonsData[currentSeasonKey];
-            if (currentEpisodeIndex < episodeLinks.length - 1) {
-                playEpisodeByIndex(currentEpisodeIndex + 1);
-            }
-        }
-
-        function playPrevious() {
-            if (currentEpisodeIndex > 0) {
-                playEpisodeByIndex(currentEpisodeIndex - 1);
-            }
-        }
-
-        if (seriesId) {
-            fetchSeriesData();
-        }
+        if (seriesId) fetchSeriesData();
     </script>
 
 </body>
