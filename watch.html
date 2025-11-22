@@ -23,7 +23,7 @@
         .video-wrapper { 
             position: relative; 
             width: 100%; 
-            height: 100%; /* سيتم تعديل الارتفاع لترك مساحة للأزرار */
+            height: 100%; 
             background: #000;
             flex-grow: 1;
         }
@@ -38,7 +38,7 @@
             left: 0; 
         }
 
-        /* === تصميم أزرار التحكم (التالي/السابق) === */
+        /* === شريط التحكم (التالي والسابق) === */
         .controls-bar {
             background-color: #111;
             padding: 15px;
@@ -64,7 +64,6 @@
 
         .nav-btn:hover { background-color: var(--primary-color); color: black; border-color: var(--primary-color); }
         
-        /* زر معطل (لا توجد حلقة تالية/سابقة) */
         .nav-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -89,7 +88,7 @@
         @media (max-width: 768px) { 
             .watch-container { height: auto; flex-direction: column; } 
             .main-content { height: auto; min-height: 40vh; } 
-            .video-wrapper { height: 56.25vw; /* Aspect Ratio for mobile */ }
+            .video-wrapper { height: 56.25vw; }
             .episodes-section { height: 60vh; } 
         }
     </style>
@@ -139,11 +138,9 @@
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
         
-        // عناصر المشغلات
+        // عناصر الصفحة
         const iframePlayer = document.getElementById('iframe-player');
         const mp4Player = document.getElementById('mp4-player');
-        
-        // عناصر التحكم
         const episodesContainer = document.getElementById('episodes-container');
         const seasonSelect = document.getElementById('season-select');
         const nextBtn = document.getElementById('next-btn');
@@ -152,27 +149,43 @@
         
         let currentSeasonsData = {}; 
         let currentSeasonKey = "1";
-        let currentEpisodeIndex = 0; // لتتبع رقم الحلقة الحالية
+        let currentEpisodeIndex = 0;
 
-        // === دالة تشغيل الفيديو الذكية ===
+        // === دالة ذكية لتشغيل الفيديو (تدعم جوجل درايف + MP4) ===
         function playVideo(url) {
             const isMp4 = url.includes('.mp4') || url.includes('.mkv');
+            const isGoogleDrive = url.includes('drive.google.com');
 
+            // 1. إذا كان ملف مباشر (MP4)
             if (isMp4) {
                 iframePlayer.style.display = 'none';
                 iframePlayer.src = "";
                 mp4Player.style.display = 'block';
                 mp4Player.src = url;
                 mp4Player.play();
-            } else {
+            } 
+            // 2. إذا كان جوجل درايف أو يوتيوب (Iframe)
+            else {
                 mp4Player.style.display = 'none';
                 mp4Player.pause();
                 iframePlayer.style.display = 'block';
-                const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+                
+                let finalUrl = url;
+
+                // معالجة رابط جوجل درايف ليصبح قابلاً للتضمين
+                if (isGoogleDrive) {
+                    finalUrl = url.replace('/view', '/preview').replace('/usp=sharing', '');
+                } 
+                // معالجة التشغيل التلقائي لباقي الروابط
+                else {
+                    finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+                }
+
                 iframePlayer.src = finalUrl;
             }
         }
 
+        // === جلب البيانات من الخادم ===
         async function fetchSeriesData() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
@@ -195,7 +208,6 @@
             const seasonKeys = Object.keys(currentSeasonsData);
             seasonSelect.innerHTML = "";
             
-            // ترتيب المواسم رقمياً
             seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
 
             seasonKeys.forEach(s => {
@@ -221,59 +233,52 @@
                 episodeLinks.forEach((url, index) => {
                     const div = document.createElement('div');
                     div.className = 'episode-item';
-                    div.id = `ep-${index}`; // معرف فريد لكل حلقة
+                    div.id = `ep-${index}`;
                     
                     div.innerHTML = `<div class="episode-info"><h4>الحلقة ${index + 1}</h4></div>`;
                     
                     div.onclick = () => {
-                        playEpisodeByIndex(index); // استخدام الدالة الموحدة
+                        playEpisodeByIndex(index);
                     };
                     episodesContainer.appendChild(div);
                 });
                 
-                // تشغيل الحلقة الأولى تلقائياً
+                // تشغيل الحلقة الأولى
                 playEpisodeByIndex(0);
             } else {
                 episodesContainer.innerHTML = "<p class='status-msg'>لا توجد روابط.</p>";
-                updateControls(0, 0); // تعطيل الأزرار
+                updateControls(0, 0);
             }
         }
 
-        // === دالة تشغيل حلقة برقم الفهرس (القلب النابض للتنقل) ===
+        // === التحكم في التشغيل والتنقل ===
         function playEpisodeByIndex(index) {
             const episodeLinks = currentSeasonsData[currentSeasonKey];
             if (!episodeLinks || !episodeLinks[index]) return;
 
             currentEpisodeIndex = index;
             
-            // 1. تشغيل الفيديو
+            // تشغيل الفيديو
             playVideo(episodeLinks[index]);
 
-            // 2. تحديث القائمة الجانبية (تلوين النشط)
+            // تحديث القائمة الجانبية
             document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
             const activeItem = document.getElementById(`ep-${index}`);
             if (activeItem) {
                 activeItem.classList.add('active');
-                // تمرير القائمة تلقائياً لتظهر الحلقة النشطة
                 activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            // 3. تحديث حالة الأزرار
+            // تحديث الأزرار
             updateControls(index, episodeLinks.length);
         }
 
-        // تحديث حالة أزرار التالي والسابق
         function updateControls(currentIndex, totalEpisodes) {
             episodeCounter.innerText = `الحلقة ${currentIndex + 1} من ${totalEpisodes}`;
-
-            // زر السابق: يعمل فقط إذا لم نكن في الحلقة الأولى (index > 0)
             prevBtn.disabled = (currentIndex === 0);
-
-            // زر التالي: يعمل فقط إذا لم نكن في الحلقة الأخيرة
             nextBtn.disabled = (currentIndex === totalEpisodes - 1);
         }
 
-        // وظيفة الزر "التالي"
         function playNext() {
             const episodeLinks = currentSeasonsData[currentSeasonKey];
             if (currentEpisodeIndex < episodeLinks.length - 1) {
@@ -281,7 +286,6 @@
             }
         }
 
-        // وظيفة الزر "السابق"
         function playPrevious() {
             if (currentEpisodeIndex > 0) {
                 playEpisodeByIndex(currentEpisodeIndex - 1);
