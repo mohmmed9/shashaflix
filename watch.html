@@ -6,21 +6,92 @@
     <title>مشاهدة - SHASHAFLIX</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { overflow-x: hidden; }
+        body { overflow-x: hidden; background-color: #000; }
+        
         .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
-        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; }
-        .video-wrapper { position: relative; width: 100%; height: 100%; }
-        .video-player { width: 100%; height: 100%; border: none; }
+        
+        /* قسم الفيديو */
+        .main-content { 
+            flex: 3; 
+            background: #000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            position: relative; 
+        }
+        
+        .video-wrapper { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; /* سيتم تعديل الارتفاع لترك مساحة للأزرار */
+            background: #000;
+            flex-grow: 1;
+        }
+        
+        /* المشغلات */
+        .video-player { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+        }
+
+        /* === تصميم أزرار التحكم (التالي/السابق) === */
+        .controls-bar {
+            background-color: #111;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333;
+        }
+
+        .nav-btn {
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover { background-color: var(--primary-color); color: black; border-color: var(--primary-color); }
+        
+        /* زر معطل (لا توجد حلقة تالية/سابقة) */
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #222;
+            color: #555;
+            border-color: #333;
+        }
+
+        /* القائمة الجانبية */
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
         .season-selector { padding: 20px; background: #141414; border-bottom: 1px solid #333; }
         .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; outline: none; }
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
+        
         .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
         .episode-info h4 { margin: 0; font-size: 14px; }
+        
         .status-msg { color: white; text-align: center; padding: 20px; margin-top: 50px; }
-        @media (max-width: 768px) { .watch-container { height: auto; flex-direction: column; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
+        
+        @media (max-width: 768px) { 
+            .watch-container { height: auto; flex-direction: column; } 
+            .main-content { height: auto; min-height: 40vh; } 
+            .video-wrapper { height: 56.25vw; /* Aspect Ratio for mobile */ }
+            .episodes-section { height: 60vh; } 
+        }
     </style>
 </head>
 <body>
@@ -35,9 +106,24 @@
     <div class="watch-container">
         <div class="main-content">
             <div class="video-wrapper">
-                <iframe id="main-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <iframe id="iframe-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                
+                <video id="mp4-player" class="video-player" controls playsinline style="display: none;">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+            </div>
+
+            <div class="controls-bar">
+                <button id="prev-btn" class="nav-btn" onclick="playPrevious()">
+                    ⏭ الحلقة السابقة
+                </button>
+                <span style="color: #aaa; font-size: 14px;" id="episode-counter"></span>
+                <button id="next-btn" class="nav-btn" onclick="playNext()">
+                    الحلقة التالية ⏮
+                </button>
             </div>
         </div>
+
         <div class="episodes-section">
             <div class="season-selector">
                 <select id="season-select"></select>
@@ -49,17 +135,43 @@
     </div>
 
     <script>
-        // رابط السيرفر
         const renderBaseUrl = 'https://shashaflix.onrender.com';
-
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
         
-        const player = document.getElementById('main-player');
+        // عناصر المشغلات
+        const iframePlayer = document.getElementById('iframe-player');
+        const mp4Player = document.getElementById('mp4-player');
+        
+        // عناصر التحكم
         const episodesContainer = document.getElementById('episodes-container');
         const seasonSelect = document.getElementById('season-select');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const episodeCounter = document.getElementById('episode-counter');
         
         let currentSeasonsData = {}; 
+        let currentSeasonKey = "1";
+        let currentEpisodeIndex = 0; // لتتبع رقم الحلقة الحالية
+
+        // === دالة تشغيل الفيديو الذكية ===
+        function playVideo(url) {
+            const isMp4 = url.includes('.mp4') || url.includes('.mkv');
+
+            if (isMp4) {
+                iframePlayer.style.display = 'none';
+                iframePlayer.src = "";
+                mp4Player.style.display = 'block';
+                mp4Player.src = url;
+                mp4Player.play();
+            } else {
+                mp4Player.style.display = 'none';
+                mp4Player.pause();
+                iframePlayer.style.display = 'block';
+                const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+                iframePlayer.src = finalUrl;
+            }
+        }
 
         async function fetchSeriesData() {
             try {
@@ -83,45 +195,96 @@
             const seasonKeys = Object.keys(currentSeasonsData);
             seasonSelect.innerHTML = "";
             
-            seasonKeys.sort().forEach(s => {
+            // ترتيب المواسم رقمياً
+            seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
+
+            seasonKeys.forEach(s => {
                 seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
             });
 
-            seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
+            seasonSelect.onchange = () => {
+                currentSeasonKey = seasonSelect.value;
+                loadEpisodes(currentSeasonKey);
+            };
 
             if (seasonKeys.length > 0) {
-                loadEpisodes(seasonKeys[0]);
+                currentSeasonKey = seasonKeys[0];
+                loadEpisodes(currentSeasonKey);
             }
         }
 
         function loadEpisodes(seasonKey) {
             episodesContainer.innerHTML = "";
-            // هنا التغيير: البيانات الآن هي مجرد قائمة روابط (Strings)
             const episodeLinks = currentSeasonsData[seasonKey]; 
 
             if (episodeLinks && episodeLinks.length > 0) {
                 episodeLinks.forEach((url, index) => {
                     const div = document.createElement('div');
                     div.className = 'episode-item';
+                    div.id = `ep-${index}`; // معرف فريد لكل حلقة
                     
-                    // التسمية التلقائية: الحلقة 1، الحلقة 2...
                     div.innerHTML = `<div class="episode-info"><h4>الحلقة ${index + 1}</h4></div>`;
                     
                     div.onclick = () => {
-                        // التعامل مع الرابط وتشغيله
-                        const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
-                        player.src = finalUrl;
-                        
-                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
-                        div.classList.add('active');
+                        playEpisodeByIndex(index); // استخدام الدالة الموحدة
                     };
                     episodesContainer.appendChild(div);
                 });
                 
-                // تشغيل الرابط الأول في القائمة
-                episodesContainer.children[0].click();
+                // تشغيل الحلقة الأولى تلقائياً
+                playEpisodeByIndex(0);
             } else {
                 episodesContainer.innerHTML = "<p class='status-msg'>لا توجد روابط.</p>";
+                updateControls(0, 0); // تعطيل الأزرار
+            }
+        }
+
+        // === دالة تشغيل حلقة برقم الفهرس (القلب النابض للتنقل) ===
+        function playEpisodeByIndex(index) {
+            const episodeLinks = currentSeasonsData[currentSeasonKey];
+            if (!episodeLinks || !episodeLinks[index]) return;
+
+            currentEpisodeIndex = index;
+            
+            // 1. تشغيل الفيديو
+            playVideo(episodeLinks[index]);
+
+            // 2. تحديث القائمة الجانبية (تلوين النشط)
+            document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+            const activeItem = document.getElementById(`ep-${index}`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                // تمرير القائمة تلقائياً لتظهر الحلقة النشطة
+                activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // 3. تحديث حالة الأزرار
+            updateControls(index, episodeLinks.length);
+        }
+
+        // تحديث حالة أزرار التالي والسابق
+        function updateControls(currentIndex, totalEpisodes) {
+            episodeCounter.innerText = `الحلقة ${currentIndex + 1} من ${totalEpisodes}`;
+
+            // زر السابق: يعمل فقط إذا لم نكن في الحلقة الأولى (index > 0)
+            prevBtn.disabled = (currentIndex === 0);
+
+            // زر التالي: يعمل فقط إذا لم نكن في الحلقة الأخيرة
+            nextBtn.disabled = (currentIndex === totalEpisodes - 1);
+        }
+
+        // وظيفة الزر "التالي"
+        function playNext() {
+            const episodeLinks = currentSeasonsData[currentSeasonKey];
+            if (currentEpisodeIndex < episodeLinks.length - 1) {
+                playEpisodeByIndex(currentEpisodeIndex + 1);
+            }
+        }
+
+        // وظيفة الزر "السابق"
+        function playPrevious() {
+            if (currentEpisodeIndex > 0) {
+                playEpisodeByIndex(currentEpisodeIndex - 1);
             }
         }
 
