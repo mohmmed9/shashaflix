@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل العمل - SHASHAFLIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="backdrop-layer" id="backdrop-img"></div>
+    <div class="overlay-layer"></div>
+
+    <header class="navbar transparent-nav">
+        <div class="navbar-brand">
+            <img src="hero-logo.png" alt="SHASHAFLIX" style="height: 40px;">
+        </div>
+        <div class="nav-account">
+            <a href="index.html" class="btn btn-secondary">➜ العودة</a>
+        </div>
+    </header>
+
+    <div class="details-container">
+        
+        <div class="poster-wrapper">
+            <img id="detail-poster" src="" alt="Poster">
+        </div>
+
+        <div class="info-wrapper">
+            <h1 id="detail-title">جاري التحميل...</h1>
+            
+            <div class="meta-tags">
+                <span class="tag imdb" id="detail-rating">IMDb N/A</span>
+                <span class="tag year" id="detail-year">----</span>
+                <span class="tag age">+16</span> <span class="tag genre" id="detail-genre">تصنيف</span>
+            </div>
+
+            <p class="description" id="detail-desc">
+                وصف العمل سيظهر هنا...
+            </p>
+
+            <div class="actions">
+                <button class="btn btn-primary big-btn" onclick="goToWatch()">
+                    ▶ مشاهدة الآن
+                </button>
+                <button class="btn btn-secondary big-btn">
+                    + قائمتي
+                </button>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>سنة الإنتاج:</span>
+                    <span id="grid-year">----</span>
+                </div>
+                <div class="info-item">
+                    <span>البلد:</span>
+                    <span>الولايات المتحدة (مثال)</span>
+                </div>
+                <div class="info-item">
+                    <span>اللغة:</span>
+                    <span>الإنجليزية</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const renderBaseUrl = 'https://shashaflix.onrender.com';
+        const urlParams = new URLSearchParams(window.location.search);
+        const workId = urlParams.get('id');
+
+        // دالة الانتقال للمشاهدة
+        function goToWatch() {
+            if(workId) window.location.href = `watch.html?id=${workId}`;
+        }
+
+        async function fetchDetails() {
+            try {
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                const works = await response.json();
+                const work = works.find(w => w.id === workId);
+
+                if (work) {
+                    // تعبئة البيانات
+                    document.title = `${work.title} - SHASHAFLIX`;
+                    
+                    // الصور
+                    const poster = work.posterUrl || 'https://via.placeholder.com/300x450';
+                    // نستخدم نفس البوستر للخلفية إذا لم يكن هناك غلاف (cover)
+                    const backdrop = work.coverUrl || poster; 
+
+                    document.getElementById('detail-poster').src = poster;
+                    document.getElementById('backdrop-img').style.backgroundImage = `url('${backdrop}')`;
+                    
+                    // النصوص
+                    document.getElementById('detail-title').innerText = work.title;
+                    document.getElementById('detail-desc').innerText = work.description || "لا يوجد وصف.";
+                    document.getElementById('detail-year').innerText = work.year || "N/A";
+                    document.getElementById('grid-year').innerText = work.year || "N/A";
+                    
+                    // التقييم والتصنيف (إذا كنت أضفتهم في فايربيس)
+                    document.getElementById('detail-rating').innerText = `IMDb ${work.rating || 'N/A'}`;
+                    document.getElementById('detail-genre').innerText = work.category || 'عام';
+
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        if(workId) fetchDetails();
+    </script>
+
+</body>
+</html>
