@@ -10,97 +10,174 @@
         body { overflow-x: hidden; background-color: #000; }
         .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
         
-        /* الفيديو */
         .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .video-wrapper { position: relative; width: 100%; height: 100%; }
-        .video-player { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .video-wrapper { position: relative; width: 100%; height: 100%; background: #000; flex-grow: 1; }
+        
+        /* المشغلات */
+        .video-player { width: 100%; height: 100%; position: absolute; top: 0; left: 0; border: none; }
+        .hidden { display: none !important; }
 
         /* القائمة */
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
-        .season-selector { padding: 20px; background: #141414; }
-        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; }
+        .season-selector { padding: 20px; background: #141414; border-bottom: 1px solid #333; }
+        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; outline: none; }
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; align-items: center; }
+        
+        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
+        .episode-info h4 { margin: 0; font-size: 14px; }
         .status-msg { color: white; text-align: center; padding: 20px; margin-top: 50px; }
 
-        /* زر التخطي */
-        #skip-intro-btn {
-            position: absolute; bottom: 80px; right: 30px;
-            background: rgba(0,0,0,0.7); color: white; border: 1px solid white;
-            padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 20; display: none;
-        }
+        /* أزرار التحكم */
+        .controls-bar { background-color: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; gap: 10px; flex-wrap: wrap; }
+        
+        .nav-btn { background-color: #333; color: white; border: 1px solid #555; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .nav-btn:hover { background: var(--primary-color); color: black; }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        @media (max-width: 768px) { .watch-container { height: auto; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
+        /* زر التحميل المميز */
+        #download-btn { background-color: #28a745; border-color: #28a745; color: white; }
+        #download-btn:hover { background-color: #218838; }
+
+        /* زر التخطي */
+        #skip-intro-btn { position: absolute; bottom: 80px; right: 30px; background: rgba(0,0,0,0.7); color: white; border: 1px solid white; padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 20; display: none; }
+
+        @media (max-width: 768px) { 
+            .watch-container { height: auto; flex-direction: column; } 
+            .main-content { height: auto; min-height: 40vh; } 
+            .video-wrapper { height: 56.25vw; } 
+            .episodes-section { height: 60vh; } 
+            .controls-bar { justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
     <header class="navbar">
         <div class="navbar-brand"><img src="hero-logo.png" style="height:40px;"></div>
-        <div class="nav-account"><a href="index.html" class="btn btn-secondary">عودة</a></div>
+        <div class="nav-account"><a href="index.html" class="btn btn-secondary">➜ عودة</a></div>
     </header>
 
     <div class="watch-container">
         <div class="main-content">
             <div class="video-wrapper">
-                <video id="player" class="video-player" playsinline controls></video>
-                <button id="skip-intro-btn" onclick="skipIntro()">تخطي المقدمة ⏭</button>
+                <div id="plyr-container" class="hidden" style="width:100%; height:100%;">
+                    <video id="player" class="video-player" playsinline controls></video>
+                    <button id="skip-intro-btn" onclick="skipIntro()">تخطي المقدمة ⏭</button>
+                </div>
+
+                <iframe id="iframe-player" class="video-player hidden" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>
+
+            <div class="controls-bar">
+                <button id="prev-btn" class="nav-btn" onclick="playPrevious()">⏭ السابق</button>
+                
+                <a id="download-btn" class="nav-btn" href="#" target="_blank" style="display: none;">
+                    📥 تحميل الحلقة
+                </a>
+
+                <span style="color: #aaa; font-size: 14px;" id="episode-counter"></span>
+                <button id="next-btn" class="nav-btn" onclick="playNext()">التالي ⏮</button>
             </div>
         </div>
 
         <div class="episodes-section">
             <div class="season-selector"><select id="season-select"></select></div>
-            <div class="episodes-list" id="episodes-container">
-                <p class="status-msg">جاري التحميل...</p>
-            </div>
+            <div class="episodes-list" id="episodes-container"><p class="status-msg">جاري التحميل...</p></div>
         </div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        // ==========================================
-        // 🔑 ضع مفتاح API الخاص بك هنا
-        // ==========================================
-        const GOOGLE_API_KEY = "AIzaSyA1lndptjt3BP1PjDg2IrM5Y8Y7kfgNzck"; 
-        // ==========================================
-
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
         
         const player = new Plyr('#player');
+        const plyrContainer = document.getElementById('plyr-container');
+        const iframePlayer = document.getElementById('iframe-player');
         const skipBtn = document.getElementById('skip-intro-btn');
-        let currentSeasonsData = {}; 
+        const downloadBtn = document.getElementById('download-btn');
+        
+        const episodesContainer = document.getElementById('episodes-container');
+        const seasonSelect = document.getElementById('season-select');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const episodeCounter = document.getElementById('episode-counter');
 
-        // === الوظيفة السحرية لتحويل الرابط ===
+        let currentSeasonsData = {};
+        let currentSeasonKey = "1";
+        let currentEpisodeIndex = 0;
+
+        // === الوظيفة الذكية لتشغيل الفيديو + تحديث زر التحميل ===
         function playVideo(url) {
-            let directUrl = url;
+            // 1. تحديث زر التحميل
+            updateDownloadButton(url);
 
-            // إذا كان الرابط من جوجل درايف
+            // 2. منطق التشغيل
+            plyrContainer.classList.remove('hidden');
+            iframePlayer.classList.add('hidden');
+            skipBtn.style.display = 'none';
+
+            let isGoogleDrive = url.includes('drive.google.com');
+
+            if (isGoogleDrive) {
+                switchToIframe(url); // جوجل درايف يعمل أفضل في Iframe
+            } else {
+                // روابط أخرى (mp4 مباشر أو يوتيوب)
+                iframePlayer.classList.add('hidden');
+                iframePlayer.src = "";
+                plyrContainer.classList.remove('hidden');
+
+                if (url.includes('youtube') || url.includes('youtu.be')) {
+                    player.source = { type: 'video', sources: [{ src: url, provider: 'youtube' }] };
+                } else {
+                    player.source = { type: 'video', sources: [{ src: url, type: 'video/mp4' }] };
+                }
+                player.play();
+            }
+        }
+
+        function switchToIframe(originalUrl) {
+            plyrContainer.classList.add('hidden'); 
+            iframePlayer.classList.remove('hidden');
+            player.stop();
+            
+            let embedUrl = originalUrl;
+            if (originalUrl.includes('drive.google.com')) {
+                embedUrl = originalUrl.replace('/view', '/preview').replace('/usp=sharing', '');
+                if (!embedUrl.includes('preview')) embedUrl += '/preview';
+            }
+            iframePlayer.src = embedUrl;
+        }
+
+        // === منطق زر التحميل الذكي ===
+        function updateDownloadButton(url) {
+            downloadBtn.style.display = 'none'; // إخفاء افتراضي
+            
+            // 1. إذا كان جوجل درايف: نحوله لرابط تحميل مباشر
             if (url.includes('drive.google.com')) {
                 try {
-                    // 1. استخراج ID الملف
-                    const fileId = url.match(/\/d\/(.+?)\//)[1];
-                    
-                    // 2. تحويله إلى رابط API مباشر
-                    // هذا الرابط يعطي الفيديو "خام" (Stream) وليس صفحة ويب
-                    directUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${GOOGLE_API_KEY}`;
-                    
-                } catch (e) {
-                    console.error("خطأ في رابط جوجل درايف", e);
-                }
-            }
+                    // استخراج ID الملف
+                    let fileId = "";
+                    const match = url.match(/\/d\/(.+?)\//);
+                    if (match) fileId = match[1];
+                    else if (url.includes('id=')) fileId = url.split('id=')[1].split('&')[0];
 
-            // تشغيل الرابط في المشغل الاحترافي
-            player.source = {
-                type: 'video',
-                sources: [
-                    { src: directUrl, type: 'video/mp4' }
-                ]
-            };
-            player.play();
+                    if (fileId) {
+                        const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                        downloadBtn.href = downloadUrl;
+                        downloadBtn.style.display = 'flex';
+                    }
+                } catch(e) {}
+            } 
+            // 2. إذا كان رابط مباشر (MP4): نضعه كما هو
+            else if (url.includes('.mp4') || url.includes('.mkv')) {
+                downloadBtn.href = url;
+                downloadBtn.style.display = 'flex';
+            }
+            // (يوتيوب وروابط التضمين الأخرى لا يظهر لها زر تحميل)
         }
 
         // تخطي المقدمة
@@ -110,7 +187,7 @@
             else skipBtn.style.display = 'none';
         });
 
-        // جلب البيانات (نفس الكود السابق)
+        // جلب البيانات
         async function fetchSeriesData() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
@@ -121,40 +198,76 @@
                     currentSeasonsData = currentWork.seasons;
                     initSeasons();
                 } else {
-                    document.getElementById('episodes-container').innerHTML = "<p class='status-msg'>لا توجد حلقات.</p>";
+                    episodesContainer.innerHTML = "<p class='status-msg'>لا توجد حلقات.</p>";
                 }
             } catch (error) { console.error(error); }
         }
 
         function initSeasons() {
             const seasonKeys = Object.keys(currentSeasonsData);
-            const select = document.getElementById('season-select');
-            select.innerHTML = "";
-            seasonKeys.sort().forEach(s => select.innerHTML += `<option value="${s}">الموسم ${s}</option>`);
-            select.onchange = () => loadEpisodes(select.value);
-            if (seasonKeys.length > 0) loadEpisodes(seasonKeys[0]);
+            seasonSelect.innerHTML = "";
+            seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
+            seasonKeys.forEach(s => seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`);
+            
+            seasonSelect.onchange = () => {
+                currentSeasonKey = seasonSelect.value;
+                loadEpisodes(currentSeasonKey);
+            };
+
+            if (seasonKeys.length > 0) {
+                currentSeasonKey = seasonKeys[0];
+                loadEpisodes(currentSeasonKey);
+            }
         }
 
         function loadEpisodes(seasonKey) {
-            const container = document.getElementById('episodes-container');
-            container.innerHTML = "";
-            const episodes = currentSeasonsData[seasonKey];
+            episodesContainer.innerHTML = "";
+            const episodeLinks = currentSeasonsData[seasonKey];
 
-            if (episodes && episodes.length > 0) {
-                episodes.forEach((ep, index) => {
+            if (episodeLinks && episodeLinks.length > 0) {
+                episodeLinks.forEach((url, index) => {
                     const div = document.createElement('div');
                     div.className = 'episode-item';
+                    div.id = `ep-${index}`;
                     div.innerHTML = `<div class="episode-info"><h4>الحلقة ${index + 1}</h4></div>`;
                     
-                    div.onclick = () => {
-                        playVideo(ep.url);
-                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
-                        div.classList.add('active');
-                    };
-                    container.appendChild(div);
+                    div.onclick = () => { playEpisodeByIndex(index); };
+                    episodesContainer.appendChild(div);
                 });
-                container.children[0].click();
+                playEpisodeByIndex(0);
+            } else {
+                episodesContainer.innerHTML = "<p class='status-msg'>فارغ.</p>";
+                updateControls(0, 0);
             }
+        }
+
+        function playEpisodeByIndex(index) {
+            const episodeLinks = currentSeasonsData[currentSeasonKey];
+            if (!episodeLinks || !episodeLinks[index]) return;
+
+            currentEpisodeIndex = index;
+            playVideo(episodeLinks[index]);
+
+            document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+            const activeItem = document.getElementById(`ep-${index}`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            updateControls(index, episodeLinks.length);
+        }
+
+        function updateControls(currentIndex, totalEpisodes) {
+            episodeCounter.innerText = `الحلقة ${currentIndex + 1} من ${totalEpisodes}`;
+            prevBtn.disabled = (currentIndex === 0);
+            nextBtn.disabled = (currentIndex === totalEpisodes - 1);
+        }
+
+        function playNext() {
+            if (currentEpisodeIndex < currentSeasonsData[currentSeasonKey].length - 1) playEpisodeByIndex(currentEpisodeIndex + 1);
+        }
+        function playPrevious() {
+            if (currentEpisodeIndex > 0) playEpisodeByIndex(currentEpisodeIndex - 1);
         }
 
         if (seriesId) fetchSeriesData();
