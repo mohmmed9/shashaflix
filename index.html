@@ -113,7 +113,7 @@
             data.forEach(work => {
                 const img = work.posterUrl || 'https://via.placeholder.com/200x300';
                 container.innerHTML += `
-                    <div class="poster-container" onclick="window.location.href='watch.html?id=${work.id}'">
+                    <div class="poster-container" onclick="window.location.href='details.html?id=${work.id}'">
                         <img src="${img}" alt="${work.title}">
                         <div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div>
                     </div>`;
