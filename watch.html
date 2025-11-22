@@ -5,43 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مشاهدة - SHASHAFLIX</title>
     <link rel="stylesheet" href="style.css">
-    
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    
     <style>
-        body { overflow-x: hidden; background-color: #000; }
+        body { overflow-x: hidden; }
         .watch-container { display: flex; flex-wrap: wrap; height: calc(100vh - 70px); padding-top: 70px; }
-        
-        /* منطقة الفيديو */
-        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .main-content { flex: 3; background: #000; display: flex; flex-direction: column; justify-content: center; }
         .video-wrapper { position: relative; width: 100%; height: 100%; }
-        
-        /* المشغلات */
-        .video-player, iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
-        
-        /* إخفاء وإظهار حسب النوع */
-        .hidden { display: none !important; }
-
-        /* القائمة الجانبية */
+        .video-player { width: 100%; height: 100%; border: none; }
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
         .season-selector { padding: 20px; background: #141414; border-bottom: 1px solid #333; }
-        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; }
+        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; outline: none; }
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; align-items: center; }
+        .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
         .episode-info h4 { margin: 0; font-size: 14px; }
-
-        /* زر تخطي المقدمة (يعمل فقط مع MP4) */
-        #skip-intro-btn {
-            position: absolute; bottom: 80px; right: 30px;
-            background-color: rgba(0, 0, 0, 0.7); color: white;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            padding: 10px 20px; border-radius: 5px; cursor: pointer;
-            z-index: 50; display: none;
-        }
-        #skip-intro-btn:hover { background-color: #00BFFF; color: black; }
-
+        .status-msg { color: white; text-align: center; padding: 20px; margin-top: 50px; }
         @media (max-width: 768px) { .watch-container { height: auto; flex-direction: column; } .main-content { height: 40vh; } .episodes-section { height: 60vh; } }
     </style>
 </head>
@@ -57,81 +35,32 @@
     <div class="watch-container">
         <div class="main-content">
             <div class="video-wrapper">
-                
-                <iframe id="iframe-player" class="hidden" src="" allowfullscreen></iframe>
-
-                <div id="plyr-container" class="hidden">
-                    <video id="player" playsinline controls></video>
-                    <button id="skip-intro-btn" onclick="skipIntro()"> تخطي المقدمة ⏭</button>
-                </div>
-
+                <iframe id="main-player" class="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
         </div>
-
         <div class="episodes-section">
-            <div class="season-selector"><select id="season-select"></select></div>
-            <div class="episodes-list" id="episodes-container"><p style="color:white; text-align:center; padding:20px;">جاري التحميل...</p></div>
+            <div class="season-selector">
+                <select id="season-select"></select>
+            </div>
+            <div class="episodes-list" id="episodes-container">
+                <p class="status-msg">جاري التحميل...</p>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
+        // رابط السيرفر
         const renderBaseUrl = 'https://shashaflix.onrender.com';
+
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
         
-        // عناصر المشغلات
-        const iframePlayer = document.getElementById('iframe-player');
-        const plyrContainer = document.getElementById('plyr-container');
-        const plyrVideo = document.getElementById('player');
-        const skipBtn = document.getElementById('skip-intro-btn');
+        const player = document.getElementById('main-player');
+        const episodesContainer = document.getElementById('episodes-container');
+        const seasonSelect = document.getElementById('season-select');
         
-        // إعداد Plyr
-        const player = new Plyr('#player', { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
+        let currentSeasonsData = {}; 
 
-        let currentSeasonsData = {};
-
-        // === وظيفة تشغيل الفيديو الذكية ===
-        function playVideo(url) {
-            // إخفاء كل المشغلات أولاً
-            iframePlayer.classList.add('hidden');
-            plyrContainer.classList.add('hidden');
-            skipBtn.style.display = 'none';
-            player.stop();
-
-            // 1. إذا كان الرابط من Google Drive
-            if (url.includes('drive.google.com')) {
-                // تحويل رابط المشاركة إلى رابط معاينة (Preview) ليعمل داخل الموقع
-                let driveUrl = url.replace('/view', '/preview').replace('/usp=sharing', '');
-                if(!driveUrl.includes('preview')) driveUrl += '/preview';
-
-                iframePlayer.src = driveUrl;
-                iframePlayer.classList.remove('hidden'); // إظهار مشغل Iframe
-            } 
-            // 2. إذا كان رابط يوتيوب أو مباشر (MP4)
-            else {
-                plyrContainer.classList.remove('hidden'); // إظهار المشغل الاحترافي
-                
-                if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                    player.source = { type: 'video', sources: [{ src: url, provider: 'youtube' }] };
-                } else {
-                    player.source = { type: 'video', sources: [{ src: url, type: 'video/mp4' }] };
-                }
-                player.play();
-            }
-        }
-
-        // وظيفة تخطي المقدمة (فقط للمشغل الاحترافي)
-        function skipIntro() {
-            player.forward(85);
-            skipBtn.style.display = 'none';
-        }
-        player.on('timeupdate', () => {
-            if (player.currentTime > 0 && player.currentTime < 120) skipBtn.style.display = 'block';
-            else skipBtn.style.display = 'none';
-        });
-
-        // === جلب البيانات ===
         async function fetchSeriesData() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
@@ -142,43 +71,63 @@
                     currentSeasonsData = currentWork.seasons;
                     initSeasons();
                 } else {
-                    document.getElementById('episodes-container').innerHTML = "<p style='color:white; text-align:center;'>لا توجد حلقات.</p>";
+                    episodesContainer.innerHTML = "<p class='status-msg'>لا توجد حلقات مضافة.</p>";
                 }
-            } catch (error) { console.error(error); }
+            } catch (error) {
+                console.error(error);
+                episodesContainer.innerHTML = "<p class='status-msg' style='color:red;'>خطأ في الاتصال.</p>";
+            }
         }
 
         function initSeasons() {
             const seasonKeys = Object.keys(currentSeasonsData);
-            const select = document.getElementById('season-select');
-            select.innerHTML = "";
-            seasonKeys.sort().forEach(s => select.innerHTML += `<option value="${s}">الموسم ${s}</option>`);
-            select.onchange = () => loadEpisodes(select.value);
-            if (seasonKeys.length > 0) loadEpisodes(seasonKeys[0]);
-        }
+            seasonSelect.innerHTML = "";
+            
+            seasonKeys.sort().forEach(s => {
+                seasonSelect.innerHTML += `<option value="${s}">الموسم ${s}</option>`;
+            });
 
-        function loadEpisodes(seasonKey) {
-            const container = document.getElementById('episodes-container');
-            container.innerHTML = "";
-            const episodes = currentSeasonsData[seasonKey];
+            seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
 
-            if (episodes && episodes.length > 0) {
-                episodes.forEach((ep) => {
-                    const div = document.createElement('div');
-                    div.className = 'episode-item';
-                    div.innerHTML = `<div class="episode-info"><h4>${ep.title}</h4></div>`;
-                    
-                    div.onclick = () => {
-                        playVideo(ep.url); // استدعاء الوظيفة الذكية
-                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
-                        div.classList.add('active');
-                    };
-                    container.appendChild(div);
-                });
-                container.children[0].click();
+            if (seasonKeys.length > 0) {
+                loadEpisodes(seasonKeys[0]);
             }
         }
 
-        if (seriesId) fetchSeriesData();
+        function loadEpisodes(seasonKey) {
+            episodesContainer.innerHTML = "";
+            // هنا التغيير: البيانات الآن هي مجرد قائمة روابط (Strings)
+            const episodeLinks = currentSeasonsData[seasonKey]; 
+
+            if (episodeLinks && episodeLinks.length > 0) {
+                episodeLinks.forEach((url, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'episode-item';
+                    
+                    // التسمية التلقائية: الحلقة 1، الحلقة 2...
+                    div.innerHTML = `<div class="episode-info"><h4>الحلقة ${index + 1}</h4></div>`;
+                    
+                    div.onclick = () => {
+                        // التعامل مع الرابط وتشغيله
+                        const finalUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+                        player.src = finalUrl;
+                        
+                        document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+                        div.classList.add('active');
+                    };
+                    episodesContainer.appendChild(div);
+                });
+                
+                // تشغيل الرابط الأول في القائمة
+                episodesContainer.children[0].click();
+            } else {
+                episodesContainer.innerHTML = "<p class='status-msg'>لا توجد روابط.</p>";
+            }
+        }
+
+        if (seriesId) {
+            fetchSeriesData();
+        }
     </script>
 
 </body>
