@@ -19,11 +19,11 @@
         .watch-container { 
             display: flex; 
             flex-wrap: wrap; 
-            height: calc(100vh - 70px); /* ارتفاع كامل الشاشة ناقص البار العلوي */
+            height: calc(100vh - 70px); 
             padding-top: 70px; 
         }
         
-        /* === قسم الفيديو (يسار الشاشة في الكمبيوتر / أعلى في الجوال) === */
+        /* === قسم الفيديو === */
         .main-content { 
             flex: 3; 
             background: #000; 
@@ -35,7 +35,7 @@
         .video-wrapper { 
             position: relative; 
             width: 100%; 
-            aspect-ratio: 16/9; /* يحافظ على أبعاد الفيديو السينمائية */
+            aspect-ratio: 16/9; 
             background: #000; 
             z-index: 10;
         }
@@ -43,14 +43,16 @@
         .video-player { width: 100%; height: 100%; position: absolute; top: 0; left: 0; border: none; }
         .hidden { display: none !important; }
 
-        /* === شريط التحكم أسفل الفيديو === */
+        /* === شريط التحكم === */
         .controls-bar { 
             background-color: #141414; 
             padding: 15px; 
             display: flex; 
-            justify-content: space-between; /* توزيع الأزرار */
+            justify-content: center; 
             align-items: center; 
+            gap: 15px;
             border-bottom: 1px solid #333;
+            flex-wrap: wrap;
         }
         
         .nav-btn { 
@@ -67,12 +69,12 @@
         }
         .nav-btn:hover { background: white; color: black; }
         
-        #download-btn { background-color: #28a745; display: none; color: white; }
-        #download-btn:hover { background-color: #218838; color: white; }
+        #download-btn { background-color: #1f5f30; display: none; color: white; }
+        #download-btn:hover { background-color: #28a745; }
         
         #toggle-watched-btn.is-watched { color: #28a745; border: 1px solid #28a745; background: transparent; }
 
-        /* === قسم القائمة (يمين الشاشة / أسفل في الجوال) === */
+        /* === القائمة الجانبية === */
         .episodes-section { 
             flex: 1; 
             background: #1f1f1f; 
@@ -83,97 +85,47 @@
             height: 100%; 
         }
         
-        /* === شريط المواسم (Scrollable) === */
-        .seasons-header {
-            padding: 15px;
-            background: #141414;
-            border-bottom: 1px solid #333;
-        }
+        /* === شريط المواسم (أزرار) === */
+        .seasons-header { padding: 15px; background: #141414; border-bottom: 1px solid #333; }
         
         .seasons-buttons-container { 
-            display: flex; 
-            gap: 10px; 
-            overflow-x: auto; /* يسمح بالسحب يمين ويسار */
-            white-space: nowrap;
-            padding-bottom: 5px;
-            
-            /* إخفاء شريط التمرير للمظهر الجمالي */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
+            display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 5px;
+            -ms-overflow-style: none; scrollbar-width: none;  
         }
         .seasons-buttons-container::-webkit-scrollbar { display: none; }
 
         .season-btn {
-            background: transparent;
-            color: #aaa;
-            border: 1px solid #444;
-            padding: 8px 16px;
-            cursor: pointer;
-            border-radius: 20px; /* شكل دائري للأطراف */
-            font-size: 14px;
-            flex-shrink: 0; /* يمنع انكماش الزر */
-            transition: 0.3s;
+            background: transparent; color: #aaa; border: 1px solid #444; padding: 8px 16px;
+            cursor: pointer; border-radius: 20px; font-size: 14px; flex-shrink: 0; transition: 0.3s;
         }
-        
-        .season-btn.active {
-            background: white;
-            color: black;
-            border-color: white;
-            font-weight: bold;
-        }
+        .season-btn.active { background: white; color: black; border-color: white; font-weight: bold; }
 
         /* === قائمة الحلقات === */
-        .episodes-list { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            padding: 10px; 
-        }
+        .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
         
         .episode-item { 
-            display: flex; 
-            padding: 15px; 
-            margin-bottom: 8px; 
-            background: #2a2a2a; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            justify-content: space-between; 
-            align-items: center;
-            transition: 0.2s;
+            display: flex; padding: 15px; margin-bottom: 8px; background: #2a2a2a; border-radius: 5px; 
+            cursor: pointer; justify-content: space-between; align-items: center; transition: 0.2s;
             border-left: 4px solid transparent;
         }
-        
         .episode-item:hover { background: #333; }
+        .episode-item.active { background: #333; border-left: 4px solid #e50914; }
         
-        /* الحلقة النشطة (التي تعمل الآن) */
-        .episode-item.active { 
-            background: #333; 
-            border-left: 4px solid #e50914; 
-        }
-        
-        .episode-number { font-weight: bold; }
         .play-icon { font-size: 12px; color: #aaa; }
-
+        
         /* زر تخطي المقدمة */
         #skip-intro-btn { 
-            position: absolute; bottom: 60px; right: 20px; 
-            background: white; color: black; border: none; 
-            padding: 8px 16px; border-radius: 4px; 
-            cursor: pointer; z-index: 20; font-weight: bold; display: none; 
+            position: absolute; bottom: 60px; right: 20px; background: white; color: black; 
+            border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; z-index: 20; 
+            font-weight: bold; display: none; 
         }
 
         /* === تحسينات الجوال === */
         @media (max-width: 768px) { 
             .watch-container { height: auto; flex-direction: column; display: block; } 
-            
             .main-content { width: 100%; position: sticky; top: 70px; z-index: 100; }
-            
-            .episodes-section { 
-                width: 100%; 
-                height: auto; 
-                min-height: 50vh; /* تأخذ نصف الشاشة في الأسفل */
-            }
-            
-            .controls-bar { padding: 10px; }
+            .episodes-section { width: 100%; height: auto; min-height: 50vh; }
+            .controls-bar { padding: 10px; gap: 10px; }
             .nav-btn { padding: 8px 12px; font-size: 12px; }
         }
     </style>
@@ -197,7 +149,7 @@
 
             <div class="controls-bar">
                 <button class="nav-btn" onclick="playPrevious()">السابق</button>
-                <button id="toggle-watched-btn" class="nav-btn" onclick="toggleCurrentEpisodeWatched()">👁️ تمت المشاهدة</button>
+                <button id="toggle-watched-btn" class="nav-btn" onclick="toggleCurrentEpisodeWatched()">👁️ مشاهدة</button>
                 <a id="download-btn" class="nav-btn" href="#" target="_blank">📥 تحميل</a>
                 <button class="nav-btn" onclick="playNext()">التالي</button>
             </div>
@@ -206,10 +158,9 @@
         <div class="episodes-section">
             <div class="seasons-header">
                 <div class="seasons-buttons-container" id="seasons-container">
-                    <span style="color:#777; font-size:12px;">جاري التحميل...</span>
+                    <span style="color:#777; font-size:12px; padding:10px;">جاري التحميل...</span>
                 </div>
             </div>
-            
             <div class="episodes-list" id="episodes-container"></div>
         </div>
     </div>
@@ -223,12 +174,8 @@
     <script>
         const renderBaseUrl = 'https://shashaflix.onrender.com';
         const urlParams = new URLSearchParams(window.location.search);
-        
-        // تنظيف ID بذكاء
         let rawId = urlParams.get('id');
-        if (rawId) rawId = decodeURIComponent(rawId).trim();
 
-        // العناصر
         const seasonsContainer = document.getElementById('seasons-container');
         const episodesContainer = document.getElementById('episodes-container');
         const downloadBtn = document.getElementById('download-btn');
@@ -244,6 +191,12 @@
         let currentEpisodeIndex = 0;
         let currentUser = null;
         let watchedHistory = {};
+
+        // === 1. وظيفة تطبيع النصوص (سر الحل) ===
+        // هذه الدالة تحذف المسافات والرموز وتحول النص لأحرف صغيرة للمقارنة
+        function normalize(str) {
+            return String(str).toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
 
         // Firebase Auth
         firebase.auth().onAuthStateChanged(user => {
@@ -271,7 +224,7 @@
             markAsWatched(currentSeasonKey, currentEpisodeIndex, !watchedHistory[key]);
         }
 
-        // تشغيل الفيديو (الهجين)
+        // تشغيل الفيديو
         function playVideo(url) {
             checkDownloadLink(url);
             updateWatchedButtonUI();
@@ -309,37 +262,36 @@
             }
         }
 
-        // جلب البيانات بدون أخطاء
+        // === 2. الجلب القوي (مع التعديل الجديد) ===
         async function fetchSeriesData() {
             try {
                 const response = await fetch(`${renderBaseUrl}/api/works`);
                 const works = await response.json();
                 
-                // البحث المرن
-                const currentWork = works.find(w => 
-                    w.id === rawId || 
-                    w.id === rawId.replace(/ /g, '%20') ||
-                    String(w.id).toLowerCase() === String(rawId).toLowerCase()
-                );
+                // استخدام دالة normalize للمقارنة القوية جداً
+                const targetId = normalize(rawId);
+                const currentWork = works.find(w => normalize(w.id) === targetId);
 
                 if (currentWork && currentWork.seasons) {
                     currentSeasonsData = currentWork.seasons;
                     renderSeasonsButtons();
                 } else {
-                    seasonsContainer.innerHTML = "<span style='color:red'>لم يتم العثور على العمل</span>";
+                    seasonsContainer.innerHTML = "<span style='color:red; padding:10px;'>لم يتم العثور على العمل</span>";
+                    console.log("Failed to find work. Searched for normalized ID:", targetId);
                 }
             } catch (error) {
                 console.error(error);
+                seasonsContainer.innerHTML = "<span style='color:red; padding:10px;'>خطأ في الاتصال</span>";
             }
         }
 
-        // رسم الأزرار
         function renderSeasonsButtons() {
             seasonsContainer.innerHTML = "";
-            const keys = Object.keys(currentSeasonsData).sort((a,b) => parseInt(a)-parseInt(b));
+            // ترتيب المواسم رقمياً
+            const keys = Object.keys(currentSeasonsData).sort((a,b) => parseInt(a) - parseInt(b));
             
             if (keys.length === 0) {
-                seasonsContainer.innerHTML = "<span>لا توجد مواسم</span>";
+                seasonsContainer.innerHTML = "<span style='padding:10px;'>لا توجد مواسم</span>";
                 return;
             }
 
@@ -356,6 +308,7 @@
                 seasonsContainer.appendChild(btn);
             });
 
+            // تفعيل الموسم الأول
             if (keys.length > 0) {
                 seasonsContainer.children[0].click();
             }
@@ -379,10 +332,6 @@
                 });
                 
                 updateEpisodesUI();
-                // تشغيل تلقائي اختياري
-                 if (currentEpisodeIndex === 0 && !player.playing && !iframePlayer.src) {
-                     // playEpisodeByIndex(0);
-                 }
             } else {
                 episodesContainer.innerHTML = "<p style='color:#777; padding:20px; text-align:center'>لا توجد حلقات</p>";
             }
@@ -392,8 +341,6 @@
             document.querySelectorAll('.episode-item').forEach(div => {
                 const epIndex = div.id.split('-')[1];
                 const key = `s${currentSeasonKey}_e${epIndex}`;
-                
-                // تحديث اللون إذا تمت المشاهدة
                 if (watchedHistory[key]) div.style.opacity = "0.5";
                 else div.style.opacity = "1";
             });
