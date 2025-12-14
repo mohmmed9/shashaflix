@@ -3,114 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فحص الأخطاء - SHASHAFLIX</title>
-    <style>
-        body { background: #111; color: white; font-family: sans-serif; padding: 20px; }
-        #debug-console {
-            background: #000;
-            border: 2px solid #0f0;
-            color: #0f0;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            min-height: 200px;
-        }
-        .error { color: #f00; border-color: #f00; }
-        .success { color: #0f0; }
-        button { padding: 10px 20px; cursor: pointer; font-size: 16px; }
-    </style>
-</head>
-<body>
-
-    <h2>🛑 وضع فحص الأخطاء (Debug Mode)</h2>
-    <div id="debug-console">جاري بدء الفحص...</div>
-    
-    <div id="content-preview">
-        <h3>بيانات المسلسل:</h3>
-        <pre id="json-preview">انتظار البيانات...</pre>
-    </div>
-
-    <script>
-        const debugConsole = document.getElementById('debug-console');
-        const jsonPreview = document.getElementById('json-preview');
-        const renderBaseUrl = 'https://shashaflix.onrender.com';
-        
-        // الحصول على ID من الرابط
-        const urlParams = new URLSearchParams(window.location.search);
-        const seriesId = urlParams.get('id');
-
-        function log(msg, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            debugConsole.innerHTML += `[${time}] ${msg}\n`;
-            if (type === 'error') debugConsole.style.borderColor = '#f00';
-        }
-
-        async function runDiagnostics() {
-            log(`1. معرف المسلسل في الرابط (ID): ${seriesId}`);
-
-            if (!seriesId) {
-                log("❌ خطأ: لا يوجد ID في الرابط. تأكد أنك دخلت من الصفحة الرئيسية.", "error");
-                return;
-            }
-
-            log("2. جاري الاتصال بـ Render API...");
-
-            try {
-                const response = await fetch(`${renderBaseUrl}/api/works`);
-                
-                if (!response.ok) {
-                    throw new Error(`فشل الاتصال: ${response.status}`);
-                }
-
-                log("✅ تم الاتصال بالسيرفر بنجاح.");
-                
-                const works = await response.json();
-                log(`3. عدد الأعمال المسترجعة: ${works.length}`);
-
-                const currentWork = works.find(w => w.id === seriesId);
-
-                if (!currentWork) {
-                    log(`❌ خطأ: لم يتم العثور على مسلسل بهذا الـ ID (${seriesId}) في قاعدة البيانات.`, "error");
-                    log("تأكد أن الـ ID في Firebase يطابق الـ ID في الرابط.");
-                    return;
-                }
-
-                log(`✅ تم العثور على العمل: ${currentWork.title}`);
-                jsonPreview.innerText = JSON.stringify(currentWork, null, 2);
-
-                // فحص المواسم
-                if (!currentWork.seasons) {
-                    log("❌ خطأ قاتل: لا يوجد حقل اسمه 'seasons' في هذا المستند!", "error");
-                    log("تأكد في Firebase أنك كتبت الكلمة 'seasons' (حروف صغيرة) والنوع Map.");
-                } else {
-                    const keys = Object.keys(currentWork.seasons);
-                    log(`✅ تم العثور على مواسم. العدد: ${keys.length}`);
-                    log(`أرقام المواسم الموجودة: ${keys.join(', ')}`);
-                    
-                    if (keys.length > 0) {
-                        const firstSeason = currentWork.seasons[keys[0]];
-                        if (Array.isArray(firstSeason)) {
-                            log(`✅ الموسم ${keys[0]} هو عبارة عن قائمة (Array) وتحتوي ${firstSeason.length} حلقات.`);
-                        } else {
-                            log(`❌ خطأ: الموسم ${keys[0]} ليس قائمة (Array). نوعه هو: ${typeof firstSeason}`, "error");
-                        }
-                    }
-                }
-
-            } catch (error) {
-                log(`❌ حدث خطأ أثناء الجلب: ${error.message}`, "error");
-            }
-        }
-
-        runDiagnostics();
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مشاهدة - SHASHAFLIX</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -126,16 +18,34 @@
 
         /* القائمة الجانبية */
         .episodes-section { flex: 1; background: #1f1f1f; border-right: 1px solid #333; min-width: 300px; display: flex; flex-direction: column; }
+        
+        /* تنسيق القائمة المنسدلة */
         .season-selector { padding: 20px; background: #141414; border-bottom: 1px solid #333; }
-        .season-selector select { width: 100%; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; outline: none; cursor: pointer; }
+        .season-selector select { 
+            width: 100%; 
+            padding: 10px; 
+            background: #333; 
+            color: white; 
+            border: 1px solid #555; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            outline: none; 
+            cursor: pointer; 
+            appearance: none; /* لإزالة السهم الافتراضي في بعض المتصفحات */
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: left 10px center;
+            background-size: 12px;
+            padding-left: 30px;
+        }
+
         .episodes-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
         
-        /* الحلقات */
         .episode-item { display: flex; padding: 15px; margin-bottom: 5px; background: #2a2a2a; border-radius: 5px; cursor: pointer; transition: 0.2s; align-items: center; justify-content: space-between; }
         .episode-item:hover { background: #333; }
         .episode-item.active { background: var(--primary-color); color: black; font-weight: bold; }
         
-        /* الأيقونات */
         .watched-icon { color: #28a745; display: none; font-size: 18px; }
         .episode-item.watched .watched-icon { display: block; }
         .episode-item.watched { opacity: 0.7; border-left: 3px solid #28a745; }
@@ -147,13 +57,10 @@
         .nav-btn:hover { background: var(--primary-color); color: black; border-color: var(--primary-color); }
         .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* الأزرار الملونة */
-        #download-btn { background-color: #1f5f30; border-color: #1f5f30; display: none; } /* مخفي افتراضياً */
+        #download-btn { background-color: #1f5f30; border-color: #1f5f30; display: none; } 
         #download-btn:hover { background-color: #28a745; border-color: #28a745; }
         
         #toggle-watched-btn.is-watched { background-color: #28a745; border-color: #28a745; }
-
-        /* زر تخطي المقدمة */
         #skip-intro-btn { position: absolute; bottom: 80px; right: 30px; background: rgba(0,0,0,0.8); color: white; border: 1px solid white; padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 20; display: none; }
 
         @media (max-width: 768px) { 
@@ -183,27 +90,19 @@
 
             <div class="controls-bar">
                 <button id="prev-btn" class="nav-btn" onclick="playPrevious()">⏭ السابق</button>
-                
-                <button id="toggle-watched-btn" class="nav-btn" onclick="toggleCurrentEpisodeWatched()">
-                    👁️ <span id="watched-text">مشاهدة</span>
-                </button>
-
-                <a id="download-btn" class="nav-btn" href="#" target="_blank">
-                    📥 تحميل
-                </a>
-
+                <button id="toggle-watched-btn" class="nav-btn" onclick="toggleCurrentEpisodeWatched()">👁️ <span id="watched-text">مشاهدة</span></button>
+                <a id="download-btn" class="nav-btn" href="#" target="_blank">📥 تحميل</a>
                 <button id="next-btn" class="nav-btn" onclick="playNext()">التالي ⏮</button>
-                
                 <span style="color: #aaa; font-size: 14px; width: 100%; text-align: center; margin-top: 5px;" id="episode-counter"></span>
             </div>
         </div>
 
         <div class="episodes-section">
             <div class="season-selector">
-                <select id="season-select"></select>
+                <select id="season-select"><option>جاري التحميل...</option></select>
             </div>
             <div class="episodes-list" id="episodes-container">
-                <p class="status-msg">جاري التحميل...</p>
+                <p class="status-msg">جاري تحميل الحلقات...</p>
             </div>
         </div>
     </div>
@@ -219,14 +118,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const seriesId = urlParams.get('id');
 
-        // تهيئة المشغل
         const player = new Plyr('#player', {
             controls: ['play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'captions', 'settings', 'pip', 'fullscreen'],
             seekTime: 10,
             speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] }
         });
 
-        // العناصر
         const plyrContainer = document.getElementById('plyr-container');
         const iframePlayer = document.getElementById('iframe-player');
         const skipBtn = document.getElementById('skip-intro-btn');
@@ -245,7 +142,7 @@
         let currentUser = null;
         let watchedHistory = {};
 
-        // === 1. فايربيس (السجل) ===
+        // === تهيئة فايربيس ===
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
@@ -279,25 +176,22 @@
             markAsWatched(currentSeasonKey, currentEpisodeIndex, !watchedHistory[key]);
         }
 
-        // === 2. التشغيل والتحميل (تم إصلاح زر التحميل) ===
+        // === تشغيل الفيديو ===
         function playVideo(url) {
-            // تحديث زر التحميل وزر المشاهدة فوراً
             checkDownloadLink(url);
             updateWatchedButtonUI();
 
             let isGoogleDrive = url.includes('drive.google.com');
 
             if (isGoogleDrive) {
-                // تشغيل جوجل درايف في Iframe
                 plyrContainer.classList.add('hidden');
                 iframePlayer.classList.remove('hidden');
                 player.stop();
-
+                
                 let embedUrl = url.replace('/view', '/preview').replace('/usp=sharing', '');
                 if (!embedUrl.includes('preview')) embedUrl += '/preview';
                 iframePlayer.src = embedUrl;
             } else {
-                // تشغيل MP4 في Plyr
                 iframePlayer.classList.add('hidden');
                 iframePlayer.src = "";
                 plyrContainer.classList.remove('hidden');
@@ -311,15 +205,169 @@
             }
         }
 
-        // دالة إصلاح زر التحميل
         function checkDownloadLink(url) {
-            downloadBtn.style.display = 'none'; // إخفاء افتراضي
-
+            downloadBtn.style.display = 'none';
             if (url.includes('drive.google.com')) {
-                // استخراج ID لجوجل درايف
-                let fileId = "";
                 try {
+                    let fileId = "";
                     const match = url.match(/\/d\/(.+?)\//);
                     if (match) fileId = match[1];
-                    else if (url.includes('id=')) fileId = url
+                    else if (url.includes('id=')) fileId = url.split('id=')[1].split('&')[0];
+                    if (fileId) {
+                        downloadBtn.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                        downloadBtn.style.display = 'flex';
+                    }
+                } catch(e) {}
+            } else if (url.includes('.mp4') || url.includes('.mkv')) {
+                downloadBtn.href = url;
+                downloadBtn.style.display = 'flex';
+            }
+        }
 
+        // === جلب البيانات وعرضها (الجزء المهم) ===
+        async function fetchSeriesData() {
+            try {
+                const response = await fetch(`${renderBaseUrl}/api/works`);
+                const works = await response.json();
+                
+                // مقارنة مرنة للعثور على المسلسل
+                const currentWork = works.find(work => work.id == seriesId); 
+
+                if (currentWork && currentWork.seasons) {
+                    currentSeasonsData = currentWork.seasons;
+                    initSeasons();
+                } else {
+                    episodesContainer.innerHTML = "<p class='status-msg'>لم يتم العثور على حلقات.</p>";
+                    seasonSelect.innerHTML = "<option>فارغ</option>";
+                }
+            } catch (error) { 
+                console.error(error);
+                episodesContainer.innerHTML = "<p class='status-msg' style='color:red;'>خطأ في الاتصال.</p>";
+            }
+        }
+
+        function initSeasons() {
+            const seasonKeys = Object.keys(currentSeasonsData);
+            
+            // ترتيب المواسم رقمياً
+            seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
+
+            seasonSelect.innerHTML = "";
+            if (seasonKeys.length === 0) {
+                seasonSelect.innerHTML = "<option>لا توجد مواسم</option>";
+                return;
+            }
+
+            // تعبئة القائمة
+            seasonKeys.forEach(s => {
+                const option = document.createElement("option");
+                option.value = s;
+                option.text = `الموسم ${s}`;
+                seasonSelect.appendChild(option);
+            });
+            
+            // عند تغيير الموسم
+            seasonSelect.onchange = () => {
+                currentSeasonKey = seasonSelect.value;
+                loadEpisodes(currentSeasonKey);
+            };
+
+            // تشغيل الموسم الأول تلقائياً
+            currentSeasonKey = seasonKeys[0];
+            seasonSelect.value = currentSeasonKey; // تأكيد اختيار الموسم الأول في القائمة
+            loadEpisodes(currentSeasonKey);
+        }
+
+        function loadEpisodes(seasonKey) {
+            episodesContainer.innerHTML = "";
+            const episodeLinks = currentSeasonsData[seasonKey];
+
+            if (episodeLinks && Array.isArray(episodeLinks) && episodeLinks.length > 0) {
+                episodeLinks.forEach((url, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'episode-item';
+                    div.id = `ep-${index}`;
+                    div.dataset.season = seasonKey;
+                    div.dataset.index = index;
+
+                    div.innerHTML = `
+                        <div class="episode-info"><h4>الحلقة ${index + 1}</h4></div>
+                        <span class="watched-icon">✔</span>
+                    `;
+                    
+                    div.onclick = () => { playEpisodeByIndex(index); };
+                    episodesContainer.appendChild(div);
+                });
+                
+                updateEpisodesUI();
+                
+                // إذا لم يكن الفيديو يعمل، شغل الحلقة الأولى
+                if (currentEpisodeIndex === 0 && !player.playing) {
+                   // playEpisodeByIndex(0); // يمكنك تفعيل هذا السطر للتشغيل التلقائي
+                }
+            } else {
+                episodesContainer.innerHTML = "<p class='status-msg'>لا توجد حلقات في هذا الموسم.</p>";
+            }
+        }
+
+        function updateEpisodesUI() {
+            document.querySelectorAll('.episode-item').forEach(div => {
+                const s = div.dataset.season;
+                const e = div.dataset.index;
+                const key = `s${s}_e${e}`;
+                if (watchedHistory[key]) div.classList.add('watched');
+                else div.classList.remove('watched');
+            });
+        }
+
+        function updateWatchedButtonUI() {
+            const key = `s${currentSeasonKey}_e${currentEpisodeIndex}`;
+            if (watchedHistory[key]) {
+                watchedBtn.classList.add('is-watched');
+                watchedText.innerText = "تمت المشاهدة ✔";
+            } else {
+                watchedBtn.classList.remove('is-watched');
+                watchedText.innerText = "مشاهدة";
+            }
+        }
+
+        function playEpisodeByIndex(index) {
+            const episodeLinks = currentSeasonsData[currentSeasonKey];
+            if (!episodeLinks || !episodeLinks[index]) return;
+
+            currentEpisodeIndex = index;
+            playVideo(episodeLinks[index]);
+
+            document.querySelectorAll('.episode-item').forEach(e => e.classList.remove('active'));
+            const activeItem = document.getElementById(`ep-${index}`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            updateControls(index, episodeLinks.length);
+        }
+
+        function updateControls(currentIndex, totalEpisodes) {
+            episodeCounter.innerText = `الحلقة ${currentIndex + 1} من ${totalEpisodes}`;
+            prevBtn.disabled = (currentIndex === 0);
+            nextBtn.disabled = (currentIndex === totalEpisodes - 1);
+        }
+
+        function playNext() {
+            if (currentEpisodeIndex < currentSeasonsData[currentSeasonKey].length - 1) playEpisodeByIndex(currentEpisodeIndex + 1);
+        }
+        function playPrevious() {
+            if (currentEpisodeIndex > 0) playEpisodeByIndex(currentEpisodeIndex - 1);
+        }
+
+        function skipIntro() { player.forward(85); skipBtn.style.display = 'none'; }
+        player.on('timeupdate', () => {
+            if (player.currentTime > 0 && player.currentTime < 120) skipBtn.style.display = 'block';
+            else skipBtn.style.display = 'none';
+        });
+        player.on('ended', () => markAsWatched(currentSeasonKey, currentEpisodeIndex, true));
+
+        if (seriesId) fetchSeriesData();
+    </script>
+</body>
+</html>
