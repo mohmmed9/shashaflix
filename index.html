@@ -3,194 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأفلام (SHASHAFLIX)</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="/manifest.json">
+    <title>SHASHAFLIX | شاشة فلكس الذكية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* الستايل والتصميم متناسق مع ألوان لوجو SHASHAFLIX */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: #0c0f12; /* خلفية داكنة سينمائية */
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            margin: 30px 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* تنسيق اللوجو */
+        .logo-img {
+            max-width: 280px; /* حجم مناسب للوجو */
+            height: auto;
+            object-fit: contain;
+        }
+
+        header h1 {
+            color: #00f2fe; /* اللون التركواز المأخوذ من اللوجو */
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        header p {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* صندوق البحث الذكي */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 22px;
+            border-radius: 30px;
+            border: 2px solid #1a202c;
+            background-color: #1a202c;
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .search-btn {
+            padding: 0 35px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(45deg, #00f2fe, #4facfe); /* تدرج لوني يشبه انحناءة اللوجو */
+            color: #0c0f12;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .search-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+        }
+
+        /* منطقة عرض النتائج والمشغل */
+        .results-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .status-message {
+            text-align: center;
+            color: #718096;
+            font-size: 1.1rem;
+            padding: 40px;
+            border: 1px dashed #1a202c;
+            border-radius: 15px;
+        }
+
+        /* شاشة عرض الفيديو (الوسيط) */
+        .player-wrapper {
+            display: none; 
+            width: 100%;
+            background-color: #1a202c;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 1px solid #2d3748;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* أبعاد 16:9 السينمائية */
+            height: 0;
+            background-color: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* قائمة السيرفرات الخارجية */
+        .servers-section-title {
+            padding: 15px 20px 0 20px; 
+            font-weight: bold; 
+            color: #00f2fe;
+            font-size: 1.05rem;
+        }
+
+        .servers-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            padding: 20px;
+            background-color: #11151d;
+        }
+
+        .server-btn {
+            padding: 12px;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: 0.2s ease;
+        }
+
+        .server-btn:hover, .server-btn.active {
+            background: linear-gradient(45deg, #00f2fe, #7f00ff); /* تدرج يدمج التركواز والبنفسجي مثل تفاصيل اللوجو */
+            color: #ffffff;
+            border-color: transparent;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 242, 254, 0.2);
+        }
+    </style>
 </head>
 <body>
 
-    <div id="mySidebar" class="sidebar">
-        <button class="close-sidebar-btn" onclick="toggleMenu()">&times;</button>
-        <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">القائمة</h3>
-        <a href="#">🏠 الرئيسية</a>
-        <a href="#" onclick="openModal('login-modal'); toggleMenu()">👤 تسجيل الدخول</a>
-        <a href="#">🔥 الأكثر مشاهدة</a>
-        <a href="#">🆕 أحدث الإضافات</a>
-        <a href="#">📺 مسلسلات</a>
-    </div>
-
-    <header class="navbar">
-        <div class="nav-left-section">
-            <button class="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
-            <div class="navbar-brand">
-                <img src="hero-logo.png" alt="SHASHAFLIX" class="navbar-logo-img">
-            </div>
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="search-input" class="search-input" placeholder="ابحث عن فيلم...">
-        </div>
-
-        <nav class="nav-links">
-            <a href="#">الرئيسية</a>
-            <a href="#">أفلام</a>
-        </nav>
-
-        <div class="nav-account">
-            <button class="btn btn-secondary" onclick="openModal('login-modal')">دخول</button>
-            <button id="open-signup-btn" class="btn btn-primary" onclick="openModal('signup-modal')">حساب جديد</button>
-        </div>
+    <header>
+        <img src="logo.png" alt="SHASHAFLIX Logo" class="logo-img">
+        <h1>SHASHAFLIX</h1>
+        <p>محرك بحث ذكي ووسيط خارجي لجلب السيرفرات وروابط المشاهدة مباشرة بدون تخزين ملفات.</p>
     </header>
 
-    <section class="hero-section">
-        <div class="hero-content">
-            <img src="hero-logo.png" alt="SHASHAFLIX" class="hero-logo-img">
-            <p>شاهد أفضل الأفلام والمسلسلات بجودة عالية.</p>
-            <button class="btn btn-primary" onclick="window.location.href='watch.html'">▶ تشغيل</button>
-        </div>
-    </section>
-
-    <main class="content-rows">
-        
-        <section class="category-row">
-            <h2>الأكثر مشاهدة</h2>
-            <div class="row-posters" id="trending-row"></div>
-        </section>
-
-        <section class="category-row">
-            <h2 id="latest-title">أحدث الإضافات</h2>
-            <div class="grid-posters" id="latest-row"></div>
-        </section>
-
-        <section class="category-row">
-            <h2>أكمل المشاهدة</h2>
-            <div class="row-posters" id="continue-watching-row">
-                <p style="color:gray; font-size:14px; padding:10px;">لا يوجد سجل مشاهدة حالياً.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <div id="signup-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('signup-modal')">&times;</button>
-            <h2>إنشاء حساب</h2>
-            <form id="signup-form">
-                <div class="form-group"><input type="text" id="reg-username" placeholder="الاسم" required></div>
-                <div class="form-group"><input type="email" id="reg-email" placeholder="الإيميل" required></div>
-                <div class="form-group"><input type="password" id="reg-password" placeholder="كلمة المرور" required></div>
-                <button type="submit" class="btn btn-primary" style="width:100%">تسجيل</button>
-            </form>
-        </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم الفيلم، المسلسل، أو الأنمي...">
+        <button id="searchBtn" class="search-btn">ابحث في فلكس</button>
     </div>
 
-    <div id="login-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
-            <h2>تسجيل الدخول</h2>
-            <form id="login-form">
-                <div class="form-group"><input type="email" id="login-email" placeholder="الإيميل" required></div>
-                <div class="form-group"><input type="password" id="login-password" placeholder="كلمة المرور" required></div>
-                <button type="submit" class="btn btn-primary" style="width:100%">دخول</button>
-            </form>
+    <div class="results-container">
+        <div id="statusMessage" class="status-message">ابدأ بالبحث عن عملك المفضل لعرض السيرفرات الخارجية المتوفرة...</div>
+        
+        <div id="playerWrapper" class="player-wrapper">
+            <div class="video-container">
+                <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+            </div>
+            
+            <div class="servers-section-title">السيرفرات الخارجية المتوفرة للمشاهدة:</div>
+            <div id="serversList" class="servers-list">
+                </div>
         </div>
     </div>
 
     <script>
-        const renderBaseUrl = 'https://shashaflix.onrender.com';
-        let allWorksData = []; 
+        document.getElementById('searchBtn').addEventListener('click', startSearch);
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startSearch();
+        });
 
-        // دالة لرسم البوسترات (تستخدم لكلا القسمين)
-        function drawPosters(data, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p style="color:white; padding:20px">لا توجد بيانات.</p>';
+        function startSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const statusMessage = document.getElementById('statusMessage');
+            const playerWrapper = document.getElementById('playerWrapper');
+            const serversList = document.getElementById('serversList');
+            const videoPlayer = document.getElementById('videoPlayer');
+
+            if (!query) {
+                alert('الرجاء كتابة اسم العمل أولاً!');
                 return;
             }
 
-            data.forEach(work => {
-                const img = work.posterUrl || 'https://via.placeholder.com/200x300';
-                container.innerHTML += `
-                    <div class="poster-container" onclick="window.location.href='details.html?id=${work.id}'">
-                        <img src="${img}" alt="${work.title}">
-                        <div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div>
-                    </div>`;
+            // نظام الفلترة الذكي (تجنب مقاطع الرياضيات والشروحات)
+            const blacklist = ['شرح', 'رياضيات', 'درس', 'استاذ', 'محاضرة', 'قانون', 'تفاضل', 'تكامل'];
+            const containsMath = blacklist.some(word => query.includes(word));
+
+            if (containsMath) {
+                statusMessage.style.display = 'block';
+                statusMessage.innerHTML = '⚠️ نعتذر، هذا المحتوى يبدو تعليمياً وخارج نطاق المواد الترفيهية لـ SHASHAFLIX.';
+                playerWrapper.style.display = 'none';
+                return;
+            }
+
+            statusMessage.style.display = 'none';
+            playerWrapper.style.display = 'block';
+
+            const encodedQuery = encodeURIComponent(query);
+            
+            // مصادر وسيرفرات الفهرسة الخارجية (تعتمد على اسم البحث)
+            const mockServers = [
+                { name: "سيرفر فلكس 1", url: `https://vidsrc.to/embed/movie/${encodedQuery}` },
+                { name: "سيرفر فلكس 2", url: `https://embed.su/embed/movie/${encodedQuery}` },
+                { name: "سيرفر فلكس 3", url: `https://moviesapi.club/movie/${encodedQuery}` },
+                { name: "سيرفر احتياطي DMCA", url: `https://vidsrc.me/embed/movie?title=${encodedQuery}` }
+            ];
+
+            serversList.innerHTML = '';
+            videoPlayer.src = mockServers[0].url;
+
+            mockServers.forEach((server, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'server-btn';
+                if(index === 0) btn.classList.add('active');
+                btn.textContent = server.name;
+                
+                btn.onclick = function() {
+                    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    videoPlayer.src = server.url;
+                };
+                
+                serversList.appendChild(btn);
             });
         }
-
-        // جلب البيانات وتوزيعها
-        async function fetchWorks() {
-            try {
-                const response = await fetch(`${renderBaseUrl}/api/works`);
-                if (!response.ok) throw new Error();
-                const data = await response.json();
-                
-                allWorksData = data;
-
-                // 1. الأكثر مشاهدة: نأخذ أول 7 فقط
-                const trendingMovies = data.slice(0, 7); 
-                drawPosters(trendingMovies, 'trending-row');
-
-                // 2. أحدث الإضافات: نعرض الكل
-                drawPosters(data, 'latest-row');
-
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        // البحث
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase();
-            const filtered = allWorksData.filter(w => w.title && w.title.toLowerCase().includes(text));
-            
-            // نحدث الشبكة (أحدث الإضافات) بنتائج البحث
-            drawPosters(filtered, 'latest-row');
-            document.getElementById('latest-title').innerText = text ? "نتائج البحث" : "أحدث الإضافات";
-        });
-
-        // دوال مساعدة
-        function toggleMenu() { document.getElementById('mySidebar').classList.toggle('active'); }
-        function openModal(id) { document.getElementById(id).classList.add('visible'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
-
-        // ربط النماذج بالخادم
-        async function handleAuth(endpoint, data, modalId) {
-            try {
-                const res = await fetch(`${renderBaseUrl}${endpoint}`, {
-                    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
-                });
-                const result = await res.json();
-                alert(result.message);
-                if (res.ok) closeModal(modalId);
-            } catch (e) { alert('فشل الاتصال'); }
-        }
-
-        document.getElementById('signup-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = {
-                username: document.getElementById('reg-username').value,
-                email: document.getElementById('reg-email').value,
-                password: document.getElementById('reg-password').value
-            };
-            handleAuth('/register', data, 'signup-modal');
-        });
-
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = {
-                email: document.getElementById('login-email').value,
-                password: document.getElementById('login-password').value
-            };
-            handleAuth('/login', data, 'login-modal');
-        });
-
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js'); }
-
-        fetchWorks();
     </script>
-
 </body>
 </html>
