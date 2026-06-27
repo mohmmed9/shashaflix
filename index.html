@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHASHAFLIX | المنصة المتكاملة</title>
+    <title>SHASHAFLIX | منصة البث الذكية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* الستايل السينمائي الكامل لـ SHASHAFLIX */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -22,7 +21,7 @@
             overflow-x: hidden;
         }
 
-        /* شريط التنقل العلوي المتكامل (طراز نتفليكس) */
+        /* شريط التنقل العلوي */
         .navbar {
             padding: 15px 4%;
             display: flex;
@@ -33,11 +32,9 @@
             top: 0;
             width: 100%;
             z-index: 100;
-            flex-wrap: wrap;
-            gap: 15px;
         }
 
-        .nav-right, .nav-left {
+        .nav-right {
             display: flex;
             align-items: center;
             gap: 20px;
@@ -46,7 +43,6 @@
         .logo-img {
             max-width: 140px;
             height: auto;
-            object-fit: contain;
             cursor: pointer;
         }
 
@@ -69,43 +65,12 @@
             font-weight: bold;
         }
 
-        /* أزرار الحساب */
-        .auth-btn {
-            padding: 6px 15px;
-            border-radius: 5px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            transition: 0.3s;
-        }
-
-        .login-btn {
-            background-color: transparent;
-            color: #fff;
-            border: 1px solid #ffffff50;
-        }
-
-        .login-btn:hover {
-            border-color: #00f2fe;
-            color: #00f2fe;
-        }
-
-        .register-btn {
-            background: linear-gradient(45deg, #00f2fe, #7f00ff);
-            color: #fff;
-        }
-
-        .register-btn:hover {
-            transform: scale(1.05);
-        }
-
         /* البانر الرئيسي العريض */
         .hero-banner {
             width: 100%;
-            height: 50vh;
+            height: 45vh;
             background: linear-gradient(to top, #141414 5%, rgba(20,20,20,0.2) 50%, rgba(0,0,0,0.7) 100%), 
-                        url('https://image.tmdb.org/t/p/original/69w831Z6MdnG346wYw66A7v7g2z.jpg') no-repeat center center/cover;
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1925') no-repeat center center/cover;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -121,14 +86,7 @@
             text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
         }
 
-        .hero-desc {
-            max-width: 500px;
-            font-size: 0.9rem;
-            color: #e5e5e5;
-            line-height: 1.5;
-        }
-
-        /* صندوق البحث الجديد والمطور */
+        /* صندوق البحث المطور */
         .search-wrapper {
             width: 92%;
             max-width: 500px;
@@ -139,7 +97,7 @@
 
         .search-input {
             flex: 1;
-            padding: 10px 18px;
+            padding: 12px 18px;
             border-radius: 20px;
             border: 2px solid #282828;
             background-color: #181818;
@@ -149,8 +107,16 @@
             text-align: right;
         }
 
-        .search-input:focus {
-            border-color: #00f2fe;
+        .search-input:focus { border-color: #00f2fe; }
+
+        .search-btn {
+            padding: 0 20px;
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(45deg, #00f2fe, #7f00ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         /* قسم المشغل ومحدد الحلقات */
@@ -197,30 +163,19 @@
         }
 
         /* المحتوى والأقسام */
-        .main-container {
-            padding: 0 4%;
-        }
-
-        .section-row {
-            margin-bottom: 30px;
-        }
-
-        .row-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 12px;
-        }
-
+        .main-container { padding: 0 4%; }
+        .section-row { margin-bottom: 35px; }
+        .row-title { font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 15px; }
+        
         .posters-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
+            gap: 18px;
         }
 
         .movie-card {
             background-color: #181818;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.3s;
@@ -235,8 +190,9 @@
 
         .movie-card img {
             width: 100%;
-            height: 200px;
+            height: 210px;
             object-fit: cover;
+            background-color: #222;
         }
 
         .movie-card-title {
@@ -248,56 +204,40 @@
             text-overflow: ellipsis;
         }
 
-        .card-badge {
-            position: absolute;
-            top: 5px; right: 5px;
-            background: linear-gradient(45deg, #00f2fe, #7f00ff);
-            color: #fff;
-            padding: 1px 6px;
-            font-size: 0.65rem;
-            font-weight: bold;
-            border-radius: 4px;
-        }
-
         @media (max-width: 768px) {
-            .navbar { flex-direction: column; align-items: center; }
+            .navbar { flex-direction: column; }
             .posters-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
-            .movie-card img { height: 150px; }
+            .movie-card img { height: 155px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- شريط التنقل العلوي (نتفليكس ستايل) -->
+    <!-- شريط التنقل العلوي -->
     <nav class="navbar">
         <div class="nav-right">
-            <img src="logo.png" alt="SHASHAFLIX" class="logo-img" onclick="showCategory('all')">
+            <img src="logo.png" alt="SHASHAFLIX" class="logo-img" onclick="window.location.reload()">
             <ul class="nav-menu">
-                <li><span class="nav-link active" id="btn-all" onclick="showCategory('all')">الرئيسية</span></li>
-                <li><span class="nav-link" id="btn-anime" onclick="showCategory('أنمي')">أنميات</span></li>
-                <li><span class="nav-link" id="btn-tv" onclick="showCategory('مسلسل')">مسلسلات</span></li>
-                <li><span class="nav-link" id="btn-movie" onclick="showCategory('فيلم')">أفلام</span></li>
-                <li><span class="nav-link" id="btn-mylist" onclick="showCategory('قائمتي')">قائمتي (0)</span></li>
+                <li><span class="nav-link active" onclick="window.location.reload()">الرئيسية</span></li>
+                <li><span class="nav-link" onclick="loadTrending('tv')">مسلسلات وأنمي</span></li>
+                <li><span class="nav-link" onclick="loadTrending('movie')">أفلام</span></li>
             </ul>
-        </div>
-        <div class="nav-left">
-            <button class="auth-btn login-btn" onclick="alert('واجهة تسجيل الدخول ستتوفر قريباً!')">تسجيل الدخول</button>
-            <button class="auth-btn register-btn" onclick="alert('واجهة إنشاء الحساب ستتوفر قريباً!')">إنشاء حساب</button>
         </div>
     </nav>
 
     <!-- البانر الرئيسي -->
     <div class="hero-banner">
-        <div class="hero-title">ONE PIECE</div>
-        <div class="hero-desc">مغامرات لوفي وطاقمه الشهير للبحث عن الكنز الأسطوري ون بيس ليصبح ملك القراصنة. اضغط على البوستر بالأسفل لتشغيل الحلقات فوراً.</div>
+        <div class="hero-title">SHASHAFLIX LIVE</div>
+        <div style="max-width: 500px; font-size: 0.9rem; color: #e5e5e5;">مرحباً بك في الجيل الجديد لشاشة فلكس. محرك بحث حي يستدعي أحدث الأفلام والمسلسلات والأنميات مباشرة من الخوادم العالمية وبدقة عالية.</div>
     </div>
 
-    <!-- خانة البحث الاحترافية التلقائية -->
+    <!-- خانة البحث الشاملة والمباشرة -->
     <div class="search-wrapper">
-        <input type="text" id="searchInput" class="search-input" oninput="liveSearch()" placeholder="ابحث عن أنمي أو فيلم في القوائم...">
+        <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن أي فيلم أو أنمي بالإنجليزية (مثل: One Piece)...">
+        <button class="search-btn" onclick="searchTMDB()">بحث</button>
     </div>
 
-    <!-- المشغل الذكي ومحدد الحلقات -->
+    <!-- المشغل الذكي التلقائي ومحدد الحلقات الحية -->
     <div class="player-section" id="playerSection">
         <div class="video-container">
             <iframe id="mainIframe" src="" allowfullscreen></iframe>
@@ -305,136 +245,178 @@
         <div class="episodes-controls" id="controlsBox">
             <div style="display:flex; gap:15px; align-items:center;">
                 <label>الموسم:</label>
-                <select id="seasonSelect" onchange="changeSeason()"></select>
+                <select id="seasonSelect" onchange="updateEpisodesList()"></select>
                 <label style="margin-right:15px;">الحلقة:</label>
-                <select id="episodeSelect" onchange="loadEpisode()"></select>
+                <select id="episodeSelect" onchange="loadLiveEpisode()"></select>
             </div>
-            <div style="font-size:0.8rem; color:#00f2fe;">💡 الترجمة العربية مدمجة تلقائياً داخل المشغل.</div>
+            <div style="font-size:0.8rem; color:#00f2fe;">💡 تفعيل الترجمة: اضغط على زر الترجمة (CC) أو الترس التابع للمشغل واشغل العربية.</div>
         </div>
     </div>
 
-    <!-- منطقة عرض المحتوى والتصنيفات -->
+    <!-- منطقة عرض المحتوى والأقسام الذكية -->
     <div class="main-container">
-        <div class="section-row">
-            <div class="row-title" id="sectionTitle">كل العروض المتوفرة على فلكس</div>
+        <div class="section-row" id="tvSection">
+            <div class="row-title" id="gridTitle">العروض الشائعة والحديثة الآن</div>
             <div class="posters-grid" id="mainGrid"></div>
         </div>
     </div>
 
     <script>
-        // قاعدة البيانات الشاملة لجميع التصنيفات
-        const allItems = [
-            { id: "21", type: "tv", title: "One Piece", img: "https://image.tmdb.org/t/p/w500/v9nG0v8aG2Eg8v86I3ubsiZa6vK.jpg", badge: "أنمي", seasons: 1, episodesPerSeason: 1100 },
-            { id: "31911", type: "tv", title: "Fullmetal Alchemist", img: "https://image.tmdb.org/t/p/w500/u9g9gSbaG2Eg8v86I3ubsiZa6vK.jpg", badge: "أنمي", seasons: 1, episodesPerSeason: 64 },
-            { id: "110316", type: "tv", title: "Wednesday", img: "https://image.tmdb.org/t/p/w500/9PFonBhy46wcEpb62Y2u6Glm36G.jpg", badge: "مسلسل", seasons: 1, episodesPerSeason: 8 },
-            { id: "1396", type: "tv", title: "Breaking Bad", img: "https://image.tmdb.org/t/p/w500/ztkUQv6v1NZv6J6wSu99Zg68uGE.jpg", badge: "مسلسل", seasons: 5, episodesPerSeason: 13 },
-            { id: "299534", type: "movie", title: "Avengers: Endgame", img: "https://image.tmdb.org/t/p/w500/or066gT60Bw7u6vYg90uCj7gK96.jpg", badge: "فيلم" },
-            { id: "157336", type: "movie", title: "Interstellar", img: "https://image.tmdb.org/t/p/w500/gEU2vW9Z7786v3t2gGwYZvV6jR9.jpg", badge: "فيلم" },
-            { id: "19995", type: "movie", title: "Avatar", img: "https://image.tmdb.org/t/p/w500/kyeqW6vX4w8uW6fjoH6dJhuxv6d.jpg", badge: "فيلم" }
-        ];
+        // مفتاح API مجاني وعام لجلب البيانات مباشرة ومجاناً من أكبر قاعدة بيانات أفلام بالعالم
+        const apiKey = "844bf0047b679633e5ef264a7c1b4899";
+        let currentShowId = "";
+        let currentMediaType = "movie";
 
-        let currentCategory = "all";
-        let currentShowData = null;
+        // تشغيل الجلب التلقائي لأحدث الأعمال بمجرد فتح المنصة
+        window.onload = function() {
+            loadTrending('all');
+        };
 
-        // عرض كل العناصر عند التشغيل لأول مرة
-        renderItems(allItems);
+        // دالة جلب أحدث وأقوى الأعمال الحية من السيرفر
+        async function loadTrending(type) {
+            const grid = document.getElementById('mainGrid');
+            const title = document.getElementById('gridTitle');
+            grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🔍 جاري تحديث الواجهة بأحدث العروض...</div>";
+            
+            if(type === 'all') title.textContent = "أحدث المسلسلات والأفلام العالمية والأنمي الرائج اليوم";
+            if(type === 'tv') title.textContent = "أحدث مسلسلات الأنمي والدراما التلفزيونية";
+            if(type === 'movie') title.textContent = "أحدث الأفلام السينمائية الحالية";
 
-        function renderItems(data) {
+            try {
+                const url = `https://api.themoviedb.org/3/trending/${type}/week?api_key=${apiKey}&language=en-US`;
+                const res = await fetch(url);
+                const data = await res.json();
+                renderCards(data.results);
+            } catch (err) {
+                grid.innerHTML = "<div>خطأ في الاتصال بقاعدة البيانات.</div>";
+            }
+        }
+
+        // دالة البحث الشاملة في ملايين الأعمال
+        async function searchTMDB() {
+            const query = document.getElementById('searchInput').value.trim();
+            const grid = document.getElementById('mainGrid');
+            if(!query) return alert("اكتب اسم العمل أولاً!");
+
+            grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>🔍 جاري البحث في خوادم فلكس...</div>";
+            document.getElementById('gridTitle').textContent = `نتائج البحث عن: ${query}`;
+
+            try {
+                const url = `https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}&language=en-US`;
+                const res = await fetch(url);
+                const data = await res.json();
+                renderCards(data.results);
+            } catch (err) {
+                grid.innerHTML = "<div>حدث خطأ في البحث.</div>";
+            }
+        }
+
+        // دالة رسم الكروت وعرض صور البوسترات الحقيقية بدقة عالية
+        function renderCards(results) {
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = "";
-            if(data.length === 0) {
-                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; color:#718096;'>لم يتم العثور على نتائج.</div>";
+            
+            // تصفية العروض التي لا تمتلك صور بوسترات لضمان واجهة نظيفة 100%
+            const cleanResults = results.filter(item => item.poster_path);
+
+            if(cleanResults.length === 0) {
+                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>لم نجد نتائج مطابقة، تأكد من الاسم بالإنجليزية.</div>";
                 return;
             }
-            data.forEach(item => {
+
+            cleanResults.forEach(item => {
+                const title = item.title || item.name;
+                const type = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+                const imgUrl = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
+
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.innerHTML = `
-                    <span class="card-badge">${item.badge}</span>
-                    <img src="${item.img}" alt="${item.title}">
-                    <div class="movie-card-title">${item.title}</div>
+                    <img src="${imgUrl}" alt="${title}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Image'">
+                    <div class="movie-card-title">${title}</div>
                 `;
-                card.onclick = () => selectMedia(item);
+                card.onclick = () => startLivePlay(item.id, type);
                 grid.appendChild(card);
             });
         }
 
-        // فلترة القوائم عند الضغط على التصنيفات (أنمي، مسلسلات، أفلام)
-        function showCategory(category) {
-            currentCategory = category;
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            
-            let filtered = allItems;
-            if (category === 'all') {
-                document.getElementById('btn-all').classList.add('active');
-                document.getElementById('sectionTitle').textContent = "كل العروض المتوفرة على فلكس";
-            } else if (category === 'قائمتي') {
-                document.getElementById('btn-mylist').classList.add('active');
-                document.getElementById('sectionTitle').textContent = "قائمتي المفضلة";
-                filtered = []; // قائمة فارغة كمثال حالياً
-            } else {
-                if(category === 'أنمي') document.getElementById('btn-anime').classList.add('active');
-                if(category === 'مسلسل') document.getElementById('btn-tv').classList.add('active');
-                if(category === 'فيلم') document.getElementById('btn-movie').classList.add('active');
-                document.getElementById('sectionTitle').textContent = `قسم الـ ${category}ات`;
-                filtered = allItems.filter(item => item.badge === category);
-            }
-            renderItems(filtered);
-            document.getElementById('searchInput').value = ""; // تصفية البحث عند تغيير القسم
-        }
-
-        // نظام البحث الفوري والذكي داخل القوائم
-        function liveSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            let baseItems = allItems;
-            
-            if (currentCategory !== 'all' && currentCategory !== 'قائمتي') {
-                baseItems = allItems.filter(item => item.badge === currentCategory);
-            }
-
-            const results = baseItems.filter(item => item.title.toLowerCase().includes(query));
-            renderItems(results);
-        }
-
-        // نظام المشغل والمواسم المصلح
-        function selectMedia(item) {
+        // تشغيل الفيديو والتحقق التلقائي من الحلقات والمواسم الحقيقية للعمل
+        async function startLivePlay(id, type) {
             const playerSection = document.getElementById('playerSection');
             const controlsBox = document.getElementById('controlsBox');
             const iframe = document.getElementById('mainIframe');
             
-            playerSection.style.display = 'block';
-            window.scrollTo({ top: playerSection.offsetTop - 110, behavior: 'smooth' });
+            currentShowId = id;
+            currentMediaType = type;
 
-            if (item.type === 'movie') {
+            playerSection.style.display = 'block';
+            window.scrollTo({ top: playerSection.offsetTop - 100, behavior: 'smooth' });
+
+            if (type === 'movie') {
                 controlsBox.style.display = 'none';
-                iframe.src = `https://vidsrc.to/embed/movie/${item.id}`;
+                iframe.src = `https://vidsrc.to/embed/movie/${id}`;
             } else {
                 controlsBox.style.display = 'flex';
-                currentShowData = item;
+                // جلب بيانات المسلسل الحقيقية لمعرفة عدد مواسمه وحلقاته بالظبط من السيرفر
+                try {
+                    const url = `https://api.themoviedb.org/3/tv/${id}?api_key=${apiKey}&language=en-US`;
+                    const res = await fetch(url);
+                    const data = await res.json();
 
-                const seasonSelect = document.getElementById('seasonSelect');
-                seasonSelect.innerHTML = "";
-                for (let i = 1; i <= item.seasons; i++) {
-                    seasonSelect.innerHTML += `<option value="${i}">الموسم ${i}</option>`;
+                    const seasonSelect = document.getElementById('seasonSelect');
+                    seasonSelect.innerHTML = "";
+                    
+                    data.seasons.forEach(s => {
+                        if(s.season_number > 0) { // استبعاد الحلقات الخاصة والـ Specials
+                            seasonSelect.innerHTML += `<option value="${s.season_number}">الموسم ${s.season_number} (${s.episode_count} حلقة)</option>`;
+                        }
+                    });
+
+                    updateEpisodesList(data.seasons);
+                } catch (err) {
+                    // حل احتياطي في حال فشل جلب الحلقات الخاصة بالـ API ليعمل بشكل تلقائي ومباشر
+                    const seasonSelect = document.getElementById('seasonSelect');
+                    seasonSelect.innerHTML = `<option value="1">الموسم 1</option>`;
+                    updateEpisodesList([{season_number: 1, episode_count: 50}]);
                 }
-                changeSeason();
             }
         }
 
-        function changeSeason() {
+        // تحديث الحلقات ديناميكياً وبشكل فوري بناءً على خيار الموسم المختار
+        async function updateEpisodesList(seasonsData) {
+            const seasonSelect = document.getElementById('seasonSelect');
             const episodeSelect = document.getElementById('episodeSelect');
+            const selectedSeason = seasonSelect.value;
+            
             episodeSelect.innerHTML = "";
-            for (let i = 1; i <= currentShowData.episodesPerSeason; i++) {
+            let episodeCount = 24; // رقم افتراضي احتياطي
+
+            if(seasonsData) {
+                const currentSeasonObj = seasonsData.find(s => s.season_number == selectedSeason);
+                if(currentSeasonObj) episodeCount = currentSeasonObj.episode_count;
+            } else {
+                // في حال التحديث من خلال الـ HTML نفسه نقرأ النص المكتوب داخل خيار السيزون
+                try {
+                    const url = `https://api.themoviedb.org/3/tv/${currentShowId}?api_key=${apiKey}&language=en-US`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    const currentSeasonObj = data.seasons.find(s => s.season_number == selectedSeason);
+                    if(currentSeasonObj) episodeCount = currentSeasonObj.episode_count;
+                } catch(e){}
+            }
+
+            for (let i = 1; i <= episodeCount; i++) {
                 episodeSelect.innerHTML += `<option value="${i}">الحلقة ${i}</option>`;
             }
-            loadEpisode();
+            loadLiveEpisode();
         }
 
-        function loadEpisode() {
+        // توليد رابط البث النهائي والمضمون وتوجيهه للمشغل
+        function loadLiveEpisode() {
             const iframe = document.getElementById('mainIframe');
             const season = document.getElementById('seasonSelect').value;
             const episode = document.getElementById('episodeSelect').value;
-            iframe.src = `https://vidsrc.to/embed/tv/${currentShowData.id}/${season}/${episode}`;
+            iframe.src = `https://vidsrc.to/embed/tv/${currentShowId}/${season}/${episode}`;
         }
     </script>
 </body>
