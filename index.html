@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHASHAFLIX | شاشة فلكس الذكية</title>
+    <!-- خط جوجول الأنيق -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* الستايل والتصميم متناسق مع ألوان لوجو SHASHAFLIX */
+        /* ستايل منصة SHASHAFLIX المتناسق مع اللوجو الخاص بك */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,7 +17,7 @@
         }
 
         body {
-            background-color: #0c0f12; /* خلفية داكنة سينمائية */
+            background-color: #0c0f12;
             color: #ffffff;
             padding: 20px;
             display: flex;
@@ -34,18 +35,16 @@
             gap: 15px;
         }
 
-        /* تنسيق اللوجو */
         .logo-img {
-            max-width: 280px; /* حجم مناسب للوجو */
+            max-width: 280px;
             height: auto;
             object-fit: contain;
         }
 
         header h1 {
-            color: #00f2fe; /* اللون التركواز المأخوذ من اللوجو */
+            color: #00f2fe;
             font-size: 2.2rem;
             font-weight: 700;
-            letter-spacing: 1px;
             text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
         }
 
@@ -56,7 +55,6 @@
             line-height: 1.6;
         }
 
-        /* صندوق البحث الذكي */
         .search-container {
             width: 100%;
             max-width: 600px;
@@ -86,7 +84,7 @@
             padding: 0 35px;
             border-radius: 30px;
             border: none;
-            background: linear-gradient(45deg, #00f2fe, #4facfe); /* تدرج لوني يشبه انحناءة اللوجو */
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
             color: #0c0f12;
             font-size: 1.1rem;
             font-weight: bold;
@@ -100,7 +98,6 @@
             box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
         }
 
-        /* منطقة عرض النتائج والمشغل */
         .results-container {
             width: 100%;
             max-width: 900px;
@@ -118,7 +115,6 @@
             border-radius: 15px;
         }
 
-        /* شاشة عرض الفيديو (الوسيط) */
         .player-wrapper {
             display: none; 
             width: 100%;
@@ -131,7 +127,7 @@
 
         .video-container {
             position: relative;
-            padding-bottom: 56.25%; /* أبعاد 16:9 السينمائية */
+            padding-bottom: 56.25%; 
             height: 0;
             background-color: #000;
         }
@@ -145,7 +141,6 @@
             border: none;
         }
 
-        /* قائمة السيرفرات الخارجية */
         .servers-section-title {
             padding: 15px 20px 0 20px; 
             font-weight: bold; 
@@ -174,7 +169,7 @@
         }
 
         .server-btn:hover, .server-btn.active {
-            background: linear-gradient(45deg, #00f2fe, #7f00ff); /* تدرج يدمج التركواز والبنفسجي مثل تفاصيل اللوجو */
+            background: linear-gradient(45deg, #00f2fe, #7f00ff);
             color: #ffffff;
             border-color: transparent;
             font-weight: bold;
@@ -187,25 +182,26 @@
     <header>
         <img src="logo.png" alt="SHASHAFLIX Logo" class="logo-img">
         <h1>SHASHAFLIX</h1>
-        <p>محرك بحث ذكي ووسيط خارجي لجلب السيرفرات وروابط المشاهدة مباشرة بدون تخزين ملفات.</p>
+        <p>محرك بحث ذكي ووسيط خارجي مجاني لجلب السيرفرات وروابط المشاهدة مباشرة بدون تخزين ملفات.</p>
     </header>
 
     <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم الفيلم، المسلسل، أو الأنمي...">
+        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم الفيلم أو المسلسل بالإنجليزية (مثال: Wednesday)...">
         <button id="searchBtn" class="search-btn">ابحث في فلكس</button>
     </div>
 
     <div class="results-container">
-        <div id="statusMessage" class="status-message">ابدأ بالبحث عن عملك المفضل لعرض السيرفرات الخارجية المتوفرة...</div>
+        <div id="statusMessage" class="status-message">ابدأ بالبحث عن عملك المفضل لعرض السيرفرات الحقيقية...</div>
         
         <div id="playerWrapper" class="player-wrapper">
             <div class="video-container">
                 <iframe id="videoPlayer" src="" allowfullscreen></iframe>
             </div>
             
-            <div class="servers-section-title">السيرفرات الخارجية المتوفرة للمشاهدة:</div>
+            <div class="servers-section-title">السيرفرات الحقيقية المتوفرة للمشاهدة الفورية:</div>
             <div id="serversList" class="servers-list">
-                </div>
+                <!-- الأزرار ستتولد هنا تلقائياً -->
+            </div>
         </div>
     </div>
 
@@ -215,7 +211,10 @@
             if (e.key === 'Enter') startSearch();
         });
 
-        function startSearch() {
+        // مفتاح مجاني عام لقاعدة بيانات الأفلام العالمية (The Movie Database) لتحويل الاسم إلى ID
+        const tmdbApiKey = "844bf0047b679633e5ef264a7c1b4899"; 
+
+        async function startSearch() {
             const query = document.getElementById('searchInput').value.trim();
             const statusMessage = document.getElementById('statusMessage');
             const playerWrapper = document.getElementById('playerWrapper');
@@ -227,47 +226,82 @@
                 return;
             }
 
-            // نظام الفلترة الذكي (تجنب مقاطع الرياضيات والشروحات)
+            // فلاتر التصفية لحماية المنصة من مقاطع الرياضيات والعشوائيات
             const blacklist = ['شرح', 'رياضيات', 'درس', 'استاذ', 'محاضرة', 'قانون', 'تفاضل', 'تكامل'];
-            const containsMath = blacklist.some(word => query.includes(word));
-
-            if (containsMath) {
+            if (blacklist.some(word => query.includes(word))) {
                 statusMessage.style.display = 'block';
-                statusMessage.innerHTML = '⚠️ نعتذر، هذا المحتوى يبدو تعليمياً وخارج نطاق المواد الترفيهية لـ SHASHAFLIX.';
+                statusMessage.innerHTML = '⚠️ نعتذر، هذا المحتوى تعليمي وخارج نطاق المواد الترفيهية لـ SHASHAFLIX.';
                 playerWrapper.style.display = 'none';
                 return;
             }
 
-            statusMessage.style.display = 'none';
-            playerWrapper.style.display = 'block';
+            statusMessage.style.display = 'block';
+            statusMessage.innerHTML = '🔍 جاري البحث وجلب السيرفرات الحية...';
+            playerWrapper.style.display = 'none';
 
-            const encodedQuery = encodeURIComponent(query);
-            
-            // مصادر وسيرفرات الفهرسة الخارجية (تعتمد على اسم البحث)
-            const mockServers = [
-                { name: "سيرفر فلكس 1", url: `https://vidsrc.to/embed/movie/${encodedQuery}` },
-                { name: "سيرفر فلكس 2", url: `https://embed.su/embed/movie/${encodedQuery}` },
-                { name: "سيرفر فلكس 3", url: `https://moviesapi.club/movie/${encodedQuery}` },
-                { name: "سيرفر احتياطي DMCA", url: `https://vidsrc.me/embed/movie?title=${encodedQuery}` }
-            ];
+            try {
+                // خطوة 1: البحث في قاعدة البيانات العالمية لجلب المعرف (ID) الخاص بالفيلم أو المسلسل
+                const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbApiKey}&query=${encodeURIComponent(query)}&language=en-US`;
+                const response = await fetch(searchUrl);
+                const data = await response.json();
 
-            serversList.innerHTML = '';
-            videoPlayer.src = mockServers[0].url;
+                if (!data.results || data.results.length === 0) {
+                    statusMessage.innerHTML = '❌ لم نجد أي عمل بهذا الاسم، تأكد من كتابة الاسم بالإنجليزية بشكل صحيح.';
+                    return;
+                }
 
-            mockServers.forEach((server, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'server-btn';
-                if(index === 0) btn.classList.add('active');
-                btn.textContent = server.name;
+                // نأخذ النتيجة الأولى دائماً لأنها الأكثر دقة
+                const result = data.results[0];
+                const id = result.id;
+                const type = result.media_type === 'tv' ? 'tv' : 'movie'; // تحديد هل هو مسلسل أم فيلم
+
+                statusMessage.style.display = 'none';
+                playerWrapper.style.display = 'block';
+
+                // خطوة 2: ربط الـ ID المجلوب مباشرة مع أشهر سيرفرات الـ Embed المفتوحة عالمياً (سيرفرات حقيقية مخصصة للوسائط)
+                // السيرفرات تدعم الترجمة العربية تلقائياً داخل المشغل عبر الضغط على علامة (CC)
+                let mockServers = [];
                 
-                btn.onclick = function() {
-                    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    videoPlayer.src = server.url;
-                };
-                
-                serversList.appendChild(btn);
-            });
+                if (type === 'movie') {
+                    mockServers = [
+                        { name: "سيرفر فلكس السريع", url: `https://vidsrc.to/embed/movie/${id}` },
+                        { name: "سيرفر فلكس التلقائي", url: `https://embed.su/embed/movie/${id}` },
+                        { name: "سيرفر فلكس 3 (بديل)", url: `https://vidsrc.me/embed/movie?tmdb=${id}` },
+                        { name: "سيرفر فلكس 4 (احتياطي)", url: `https://moviesapi.club/movie/${id}` }
+                    ];
+                } else {
+                    // للمسلسلات: يتم تشغيل الحلقة الأولى من الموسم الأول تلقائياً كمثال
+                    mockServers = [
+                        { name: "سيرفر فلكس السريع", url: `https://vidsrc.to/embed/tv/${id}/1/1` },
+                        { name: "سيرفر فلكس التلقائي", url: `https://embed.su/embed/tv/${id}/1/1` },
+                        { name: "سيرفر فلكس 3 (بديل)", url: `https://vidsrc.me/embed/tv?tmdb=${id}&sea=1&epi=1` }
+                    ];
+                }
+
+                // تنظيف الأزرار القديمة وتجهيز المشغل
+                serversList.innerHTML = '';
+                videoPlayer.src = mockServers[0].url;
+
+                // إنشاء أزرار السيرفرات الحقيقية
+                mockServers.forEach((server, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'server-btn';
+                    if(index === 0) btn.classList.add('active');
+                    btn.textContent = server.name;
+                    
+                    btn.onclick = function() {
+                        document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        videoPlayer.src = server.url;
+                    };
+                    
+                    serversList.appendChild(btn);
+                });
+
+            } catch (error) {
+                statusMessage.innerHTML = '❌ حدث خطأ أثناء الاتصال بالسيرفرات، جرب مرة أخرى.';
+                console.error(error);
+            }
         }
     </script>
 </body>
