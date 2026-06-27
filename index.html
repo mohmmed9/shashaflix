@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHASHAFLIX | شاشة فلكس الذكية</title>
-    <!-- خط جوجول الأنيق -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ستايل منصة SHASHAFLIX المتناسق مع اللوجو الخاص بك */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -36,42 +34,45 @@
         }
 
         .logo-img {
-            max-width: 280px;
+            max-width: 250px;
             height: auto;
             object-fit: contain;
         }
 
         header h1 {
             color: #00f2fe;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
             text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
         }
 
         header p {
             color: #a0aec0;
-            font-size: 0.95rem;
-            max-width: 500px;
+            font-size: 0.9rem;
+            max-width: 450px;
             line-height: 1.6;
         }
 
+        /* إصلاح صندوق البحث ليكون مرناً ومترتباً صح في الجوال */
         .search-container {
             width: 100%;
             max-width: 600px;
             display: flex;
-            gap: 12px;
-            margin-bottom: 40px;
+            flex-direction: row; /* إجبار الترتيب من اليمين لليسار */
+            gap: 10px;
+            margin-bottom: 30px;
         }
 
         .search-input {
             flex: 1;
-            padding: 15px 22px;
+            padding: 15px 20px;
             border-radius: 30px;
             border: 2px solid #1a202c;
             background-color: #1a202c;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1rem;
             outline: none;
+            text-align: right; /* الكتابة تبدأ من اليمين لراحة المستخدم العربي */
             transition: 0.3s ease;
         }
 
@@ -81,21 +82,20 @@
         }
 
         .search-btn {
-            padding: 0 35px;
+            padding: 0 25px;
             border-radius: 30px;
             border: none;
             background: linear-gradient(45deg, #00f2fe, #4facfe);
             color: #0c0f12;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
+            white-space: nowrap;
             transition: 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
         }
 
         .search-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+            transform: scale(1.02);
         }
 
         .results-container {
@@ -109,8 +109,8 @@
         .status-message {
             text-align: center;
             color: #718096;
-            font-size: 1.1rem;
-            padding: 40px;
+            font-size: 1rem;
+            padding: 30px;
             border: 1px dashed #1a202c;
             border-radius: 15px;
         }
@@ -145,35 +145,43 @@
             padding: 15px 20px 0 20px; 
             font-weight: bold; 
             color: #00f2fe;
-            font-size: 1.05rem;
+            font-size: 1rem;
         }
 
         .servers-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            padding: 15px;
             background-color: #11151d;
         }
 
         .server-btn {
-            padding: 12px;
+            padding: 10px;
             background-color: #1a202c;
             color: #e2e8f0;
             border: 1px solid #2d3748;
             border-radius: 8px;
             cursor: pointer;
             text-align: center;
-            font-size: 0.9rem;
-            transition: 0.2s ease;
+            font-size: 0.85rem;
         }
 
         .server-btn:hover, .server-btn.active {
             background: linear-gradient(45deg, #00f2fe, #7f00ff);
             color: #ffffff;
-            border-color: transparent;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0, 242, 254, 0.2);
+        }
+
+        /* تعديل متجاوب مع الجوالات الصغيرة */
+        @media (max-width: 480px) {
+            .search-container {
+                flex-direction: column; /* تحويلهم فوق بعض في الشاشات الصغيرة جداً لضمان عدم التداخل */
+                border-radius: 15px;
+            }
+            .search-btn {
+                padding: 12px;
+            }
         }
     </style>
 </head>
@@ -182,11 +190,12 @@
     <header>
         <img src="logo.png" alt="SHASHAFLIX Logo" class="logo-img">
         <h1>SHASHAFLIX</h1>
-        <p>محرك بحث ذكي ووسيط خارجي مجاني لجلب السيرفرات وروابط المشاهدة مباشرة بدون تخزين ملفات.</p>
+        <p>محرك بحث فوري ووسيط لجلب سيرفرات الأنمي، الأفلام والمسلسلات مباشرة.</p>
     </header>
 
+    <!-- صندوق البحث المصلح -->
     <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم الفيلم أو المسلسل بالإنجليزية (مثال: Wednesday)...">
+        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم الأنمي أو الفيلم بالإنجليزية (مثل: One Piece)...">
         <button id="searchBtn" class="search-btn">ابحث في فلكس</button>
     </div>
 
@@ -198,10 +207,8 @@
                 <iframe id="videoPlayer" src="" allowfullscreen></iframe>
             </div>
             
-            <div class="servers-section-title">السيرفرات الحقيقية المتوفرة للمشاهدة الفورية:</div>
-            <div id="serversList" class="servers-list">
-                <!-- الأزرار ستتولد هنا تلقائياً -->
-            </div>
+            <div class="servers-section-title">السيرفرات المتوفرة للمشاهدة الفورية:</div>
+            <div id="serversList" class="servers-list"></div>
         </div>
     </div>
 
@@ -211,10 +218,7 @@
             if (e.key === 'Enter') startSearch();
         });
 
-        // مفتاح مجاني عام لقاعدة بيانات الأفلام العالمية (The Movie Database) لتحويل الاسم إلى ID
-        const tmdbApiKey = "844bf0047b679633e5ef264a7c1b4899"; 
-
-        async function startSearch() {
+        function startSearch() {
             const query = document.getElementById('searchInput').value.trim();
             const statusMessage = document.getElementById('statusMessage');
             const playerWrapper = document.getElementById('playerWrapper');
@@ -226,82 +230,46 @@
                 return;
             }
 
-            // فلاتر التصفية لحماية المنصة من مقاطع الرياضيات والعشوائيات
-            const blacklist = ['شرح', 'رياضيات', 'درس', 'استاذ', 'محاضرة', 'قانون', 'تفاضل', 'تكامل'];
+            // الفلترة الذكية لحماية الشاشة
+            const blacklist = ['شرح', 'رياضيات', 'درس', 'استاذ', 'محاضرة'];
             if (blacklist.some(word => query.includes(word))) {
                 statusMessage.style.display = 'block';
-                statusMessage.innerHTML = '⚠️ نعتذر، هذا المحتوى تعليمي وخارج نطاق المواد الترفيهية لـ SHASHAFLIX.';
+                statusMessage.innerHTML = '⚠️ نعتذر، هذا المحتوى خارج نطاق المواد الترفيهية لـ SHASHAFLIX.';
                 playerWrapper.style.display = 'none';
                 return;
             }
 
-            statusMessage.style.display = 'block';
-            statusMessage.innerHTML = '🔍 جاري البحث وجلب السيرفرات الحية...';
-            playerWrapper.style.display = 'none';
+            statusMessage.style.display = 'none';
+            playerWrapper.style.display = 'block';
 
-            try {
-                // خطوة 1: البحث في قاعدة البيانات العالمية لجلب المعرف (ID) الخاص بالفيلم أو المسلسل
-                const searchUrl = `https://api.themoviedb.org/3/search/multi?api_key=${tmdbApiKey}&query=${encodeURIComponent(query)}&language=en-US`;
-                const response = await fetch(searchUrl);
-                const data = await response.json();
+            // تحضير النص للبحث المباشر في محركات الرفع العالمية (أسرع وأضمن للأنمي والمسلسلات بدون تعقيد الـ IDs)
+            const formattedQuery = encodeURIComponent(query.toLowerCase());
 
-                if (!data.results || data.results.length === 0) {
-                    statusMessage.innerHTML = '❌ لم نجد أي عمل بهذا الاسم، تأكد من كتابة الاسم بالإنجليزية بشكل صحيح.';
-                    return;
-                }
+            // ربط مباشر مع أقوى مجمعات بث وسيطة تدعم البحث النصي مباشرة (Query-based Embeds)
+            const liveServers = [
+                { name: "سيرفر فلكس 1 (ذكي)", url: `https://vidsrc.me/embed/movie?title=${formattedQuery}` },
+                { name: "سيرفر فلكس 2 (سريع)", url: `https://embed.su/embed/movie/${formattedQuery}` },
+                { name: "سيرفر فلكس 3 (أنمي)", url: `https://vidsrc.to/embed/movie/${formattedQuery}` },
+                { name: "سيرفر فلكس 4 (احتياطي)", url: `https://moviesapi.club/movie/${formattedQuery}` }
+            ];
 
-                // نأخذ النتيجة الأولى دائماً لأنها الأكثر دقة
-                const result = data.results[0];
-                const id = result.id;
-                const type = result.media_type === 'tv' ? 'tv' : 'movie'; // تحديد هل هو مسلسل أم فيلم
+            serversList.innerHTML = '';
+            videoPlayer.src = liveServers[0].url;
 
-                statusMessage.style.display = 'none';
-                playerWrapper.style.display = 'block';
-
-                // خطوة 2: ربط الـ ID المجلوب مباشرة مع أشهر سيرفرات الـ Embed المفتوحة عالمياً (سيرفرات حقيقية مخصصة للوسائط)
-                // السيرفرات تدعم الترجمة العربية تلقائياً داخل المشغل عبر الضغط على علامة (CC)
-                let mockServers = [];
+            liveServers.forEach((server, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'server-btn';
+                if(index === 0) btn.classList.add('active');
+                btn.textContent = server.name;
                 
-                if (type === 'movie') {
-                    mockServers = [
-                        { name: "سيرفر فلكس السريع", url: `https://vidsrc.to/embed/movie/${id}` },
-                        { name: "سيرفر فلكس التلقائي", url: `https://embed.su/embed/movie/${id}` },
-                        { name: "سيرفر فلكس 3 (بديل)", url: `https://vidsrc.me/embed/movie?tmdb=${id}` },
-                        { name: "سيرفر فلكس 4 (احتياطي)", url: `https://moviesapi.club/movie/${id}` }
-                    ];
-                } else {
-                    // للمسلسلات: يتم تشغيل الحلقة الأولى من الموسم الأول تلقائياً كمثال
-                    mockServers = [
-                        { name: "سيرفر فلكس السريع", url: `https://vidsrc.to/embed/tv/${id}/1/1` },
-                        { name: "سيرفر فلكس التلقائي", url: `https://embed.su/embed/tv/${id}/1/1` },
-                        { name: "سيرفر فلكس 3 (بديل)", url: `https://vidsrc.me/embed/tv?tmdb=${id}&sea=1&epi=1` }
-                    ];
-                }
-
-                // تنظيف الأزرار القديمة وتجهيز المشغل
-                serversList.innerHTML = '';
-                videoPlayer.src = mockServers[0].url;
-
-                // إنشاء أزرار السيرفرات الحقيقية
-                mockServers.forEach((server, index) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'server-btn';
-                    if(index === 0) btn.classList.add('active');
-                    btn.textContent = server.name;
-                    
-                    btn.onclick = function() {
-                        document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        videoPlayer.src = server.url;
-                    };
-                    
-                    serversList.appendChild(btn);
-                });
-
-            } catch (error) {
-                statusMessage.innerHTML = '❌ حدث خطأ أثناء الاتصال بالسيرفرات، جرب مرة أخرى.';
-                console.error(error);
-            }
+                btn.onclick = function() {
+                    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    videoPlayer.src = server.url;
+                };
+                
+                serversList.appendChild(btn);
+            });
         }
     </script>
 </body>
