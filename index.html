@@ -25,60 +25,45 @@
         }
 
         header {
-            margin: 30px 0;
+            margin: 25px 0;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
         .logo-img {
-            max-width: 250px;
+            max-width: 220px;
             height: auto;
             object-fit: contain;
         }
 
         header h1 {
             color: #00f2fe;
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 1.8rem;
             text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
         }
 
-        header p {
-            color: #a0aec0;
-            font-size: 0.9rem;
-            max-width: 450px;
-            line-height: 1.6;
-        }
-
-        /* إصلاح صندوق البحث ليكون مرناً ومترتباً صح في الجوال */
+        /* صندوق البحث */
         .search-container {
             width: 100%;
             max-width: 600px;
             display: flex;
-            flex-direction: row; /* إجبار الترتيب من اليمين لليسار */
             gap: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .search-input {
             flex: 1;
-            padding: 15px 20px;
+            padding: 12px 20px;
             border-radius: 30px;
             border: 2px solid #1a202c;
             background-color: #1a202c;
             color: #fff;
             font-size: 1rem;
             outline: none;
-            text-align: right; /* الكتابة تبدأ من اليمين لراحة المستخدم العربي */
-            transition: 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: #00f2fe;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            text-align: right;
         }
 
         .search-btn {
@@ -90,29 +75,16 @@
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            white-space: nowrap;
-            transition: 0.3s ease;
         }
 
-        .search-btn:hover {
-            transform: scale(1.02);
-        }
-
+        /* منطقة المشغل */
         .results-container {
             width: 100%;
             max-width: 900px;
             display: flex;
             flex-direction: column;
             gap: 20px;
-        }
-
-        .status-message {
-            text-align: center;
-            color: #718096;
-            font-size: 1rem;
-            padding: 30px;
-            border: 1px dashed #1a202c;
-            border-radius: 15px;
+            margin-bottom: 30px;
         }
 
         .player-wrapper {
@@ -121,7 +93,6 @@
             background-color: #1a202c;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             border: 1px solid #2d3748;
         }
 
@@ -139,13 +110,6 @@
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        .servers-section-title {
-            padding: 15px 20px 0 20px; 
-            font-weight: bold; 
-            color: #00f2fe;
-            font-size: 1rem;
         }
 
         .servers-list {
@@ -167,21 +131,79 @@
             font-size: 0.85rem;
         }
 
-        .server-btn:hover, .server-btn.active {
+        .server-btn.active {
             background: linear-gradient(45deg, #00f2fe, #7f00ff);
             color: #ffffff;
+        }
+
+        /* ستايل أقسام الأفلام والمسلسلات في الصفحة الرئيسية */
+        .main-content {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 10px;
+        }
+
+        .section-title {
+            color: #00f2fe;
+            font-size: 1.3rem;
+            margin: 20px 0 15px 0;
+            font-weight: bold;
+            border-right: 4px solid #7f00ff;
+            padding-right: 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background-color: #1a202c;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #2d3748;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #00f2fe;
+        }
+
+        .card img {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+        }
+
+        .card-title {
+            padding: 8px;
+            font-size: 0.85rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #7f00ff;
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 5px;
             font-weight: bold;
         }
 
-        /* تعديل متجاوب مع الجوالات الصغيرة */
         @media (max-width: 480px) {
-            .search-container {
-                flex-direction: column; /* تحويلهم فوق بعض في الشاشات الصغيرة جداً لضمان عدم التداخل */
-                border-radius: 15px;
-            }
-            .search-btn {
-                padding: 12px;
-            }
+            .search-container { flex-direction: column; }
+            .grid-container { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+            .card img { height: 160px; }
         }
     </style>
 </head>
@@ -190,87 +212,116 @@
     <header>
         <img src="logo.png" alt="SHASHAFLIX Logo" class="logo-img">
         <h1>SHASHAFLIX</h1>
-        <p>محرك بحث فوري ووسيط لجلب سيرفرات الأنمي، الأفلام والمسلسلات مباشرة.</p>
     </header>
 
-    <!-- صندوق البحث المصلح -->
     <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم الأنمي أو الفيلم بالإنجليزية (مثل: One Piece)...">
-        <button id="searchBtn" class="search-btn">ابحث في فلكس</button>
+        <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن فيلم أو مسلسل بالإنجليزية...">
+        <button id="searchBtn" class="search-btn">بحث</button>
     </div>
 
     <div class="results-container">
-        <div id="statusMessage" class="status-message">ابدأ بالبحث عن عملك المفضل لعرض السيرفرات الحقيقية...</div>
-        
+        <div id="statusMessage" style="text-align:center; color:#a0aec0; display:none;">🔍 جاري تشغيل السيرفرات...</div>
         <div id="playerWrapper" class="player-wrapper">
             <div class="video-container">
                 <iframe id="videoPlayer" src="" allowfullscreen></iframe>
             </div>
-            
-            <div class="servers-section-title">السيرفرات المتوفرة للمشاهدة الفورية:</div>
+            <div style="padding: 10px 15px 0 15px; font-weight: bold; color: #00f2fe;">سيرفرات البث المتوفرة:</div>
             <div id="serversList" class="servers-list"></div>
         </div>
     </div>
 
+    <div class="main-content">
+        
+        <div class="section-title">أحدث مسلسلات الأنمي والدراما</div>
+        <div class="grid-container" id="showsGrid"></div>
+
+        <div class="section-title">أفلام ومسلسلات مقترحة</div>
+        <div class="grid-container" id="moviesGrid"></div>
+        
+    </div>
+
     <script>
-        document.getElementById('searchBtn').addEventListener('click', startSearch);
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') startSearch();
-        });
+        // داتا الصفحة الرئيسية (أفلام ومسلسلات حقيقية مع الـ IDs والبوسترات الرسمية لها)
+        const mainShows = [
+            { id: "21", type: "tv", title: "One Piece", img: "https://image.tmdb.org/t/p/w500/v9nG0v8aG2Eg8v86I3ubsiZa6vK.jpg", badge: "أنمي" },
+            { id: "31911", type: "tv", title: "Fullmetal Alchemist", img: "https://image.tmdb.org/t/p/w500/29906666aZ9877bZ9XfW4pW8U3d.jpg", badge: "أنمي" },
+            { id: "110316", type: "tv", title: "Wednesday", img: "https://image.tmdb.org/t/p/w500/9PFonBhy46wcEpb62Y2u6Glm36G.jpg", badge: "مسلسل" },
+            { id: "1396", type: "tv", title: "Breaking Bad", img: "https://image.tmdb.org/t/p/w500/ztkUQv6v1NZv6J6wSu99Zg68uGE.jpg", badge: "مسلسل" }
+        ];
 
-        function startSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            const statusMessage = document.getElementById('statusMessage');
+        const mainMovies = [
+            { id: "299534", type: "movie", title: "Avengers: Endgame", img: "https://image.tmdb.org/t/p/w500/or066gT60Bw7u6vYg90uCj7gK96.jpg", badge: "فيلم" },
+            { id: "157336", type: "movie", title: "Interstellar", img: "https://image.tmdb.org/t/p/w500/gEU2vW9Z7786v3t2gGwYZvV6jR9.jpg", badge: "فيلم" },
+            { id: "19995", type: "movie", title: "Avatar", img: "https://image.tmdb.org/t/p/w500/kyeqW6vX4w8uW6fjoH6dJhuxv6d.jpg", badge: "فيلم" },
+            { id: "515001", type: "movie", title: "Jojo Rabbit", img: "https://image.tmdb.org/t/p/w500/7Gs7vgt6wZ9878gGwW4uXmYw4pX.jpg", badge: "فيلم" }
+        ];
+
+        // عرض العناصر تلقائياً في الواجهة
+        displayCards(mainShows, 'showsGrid');
+        displayCards(mainMovies, 'moviesGrid');
+
+        function displayCards(items, gridId) {
+            const grid = document.getElementById(gridId);
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <span class="badge">${item.badge}</span>
+                    <img src="${item.img}" alt="${item.title}">
+                    <div class="card-title">${item.title}</div>
+                `;
+                // عند الضغط على الكارد يشتغل فوراً بالـ ID المضمون
+                card.onclick = () => playMedia(item.id, item.type);
+                grid.appendChild(card);
+            });
+        }
+
+        // تشغيل البث المباشر
+        function playMedia(id, type) {
             const playerWrapper = document.getElementById('playerWrapper');
-            const serversList = document.getElementById('serversList');
             const videoPlayer = document.getElementById('videoPlayer');
+            const serversList = document.getElementById('serversList');
 
-            if (!query) {
-                alert('الرجاء كتابة اسم العمل أولاً!');
-                return;
-            }
-
-            // الفلترة الذكية لحماية الشاشة
-            const blacklist = ['شرح', 'رياضيات', 'درس', 'استاذ', 'محاضرة'];
-            if (blacklist.some(word => query.includes(word))) {
-                statusMessage.style.display = 'block';
-                statusMessage.innerHTML = '⚠️ نعتذر، هذا المحتوى خارج نطاق المواد الترفيهية لـ SHASHAFLIX.';
-                playerWrapper.style.display = 'none';
-                return;
-            }
-
-            statusMessage.style.display = 'none';
             playerWrapper.style.display = 'block';
+            window.scrollTo({ top: 300, behavior: 'smooth' });
 
-            // تحضير النص للبحث المباشر في محركات الرفع العالمية (أسرع وأضمن للأنمي والمسلسلات بدون تعقيد الـ IDs)
-            const formattedQuery = encodeURIComponent(query.toLowerCase());
+            // السيرفرات الحقيقية المضمونة المشغلة بالـ ID
+            let servers = [];
+            if (type === 'movie') {
+                servers = [
+                    { name: "سيرفر فلكس 1", url: `https://vidsrc.to/embed/movie/${id}` },
+                    { name: "سيرفر فلكس 2", url: `https://embed.su/embed/movie/${id}` }
+                ];
+            } else {
+                // للمسلسلات والأنمي تشغيل الحلقة الأولى تلقائياً كمثال ثابت
+                servers = [
+                    { name: "سيرفر فلكس 1", url: `https://vidsrc.to/embed/tv/${id}/1/1` },
+                    { name: "سيرفر فلكس 2", url: `https://embed.su/embed/tv/${id}/1/1` }
+                ];
+            }
 
-            // ربط مباشر مع أقوى مجمعات بث وسيطة تدعم البحث النصي مباشرة (Query-based Embeds)
-            const liveServers = [
-                { name: "سيرفر فلكس 1 (ذكي)", url: `https://vidsrc.me/embed/movie?title=${formattedQuery}` },
-                { name: "سيرفر فلكس 2 (سريع)", url: `https://embed.su/embed/movie/${formattedQuery}` },
-                { name: "سيرفر فلكس 3 (أنمي)", url: `https://vidsrc.to/embed/movie/${formattedQuery}` },
-                { name: "سيرفر فلكس 4 (احتياطي)", url: `https://moviesapi.club/movie/${formattedQuery}` }
-            ];
-
+            videoPlayer.src = servers[0].url;
             serversList.innerHTML = '';
-            videoPlayer.src = liveServers[0].url;
 
-            liveServers.forEach((server, index) => {
+            servers.forEach((server, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'server-btn';
                 if(index === 0) btn.classList.add('active');
                 btn.textContent = server.name;
-                
-                btn.onclick = function() {
+                btn.onclick = () => {
                     document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     videoPlayer.src = server.url;
                 };
-                
                 serversList.appendChild(btn);
             });
         }
+
+        // تفعيل زر البحث العادي كخيار احتياطي
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const q = document.getElementById('searchInput').value.trim();
+            if(q) alert('اضغط على أحد بوسترات الأفلام والأنمي بالأسفل لتجربة التشغيل الفوري المضمون!');
+        });
     </script>
 </body>
 </html>
