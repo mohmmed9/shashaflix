@@ -21,7 +21,7 @@
             overflow-x: hidden;
         }
 
-        /* إصلاح كامل لشريط التنقل العلوي في الجوال لضمان عدم تداخل النصوص */
+        /* شريط التنقل العلوي */
         .navbar {
             padding: 15px 4%;
             display: flex;
@@ -66,12 +66,12 @@
             font-weight: bold;
         }
 
-        /* البانر الرئيسي السينمائي */
+        /* البانر الرئيسي */
         .hero-banner {
             width: 100%;
-            height: 42vh;
+            height: 40vh;
             background: linear-gradient(to top, #141414 8%, rgba(20,20,20,0.2) 50%, rgba(0,0,0,0.7) 100%), 
-                        url('https://image.tmdb.org/t/p/original/69w831Z6MdnG346wYw66A7v7g2z.jpg') no-repeat center center/cover;
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1925') no-repeat center center/cover;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -87,7 +87,7 @@
             text-shadow: 2px 2px 10px rgba(0,0,0,0.9);
         }
 
-        /* صندوق البحث المطور والمحاذي صح */
+        /* صندوق البحث */
         .search-wrapper {
             width: 92%;
             max-width: 500px;
@@ -177,13 +177,13 @@
         }
 
         .movie-card {
-            background-color: #181818;
-            border-radius: 6px;
+            background-color: #1a202c;
+            border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s, border-color 0.2s;
             position: relative;
-            border: 1px solid #282828;
+            border: 1px solid #2d3748;
         }
 
         .movie-card:hover {
@@ -191,30 +191,48 @@
             border-color: #00f2fe;
         }
 
+        /* البوستر مع وضع خلفية احتياطية ممتازة */
+        .movie-card .poster-box {
+            width: 100%;
+            height: 195px;
+            background-color: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
         .movie-card img {
             width: 100%;
-            height: 190px;
+            height: 100%;
             object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .movie-card-title {
-            padding: 6px;
-            font-size: 0.78rem;
+            padding: 8px;
+            font-size: 0.8rem;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            background-color: #181818;
+            font-weight: 600;
         }
 
         .card-badge {
             position: absolute;
             top: 5px; left: 5px;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             color: #00f2fe;
             padding: 2px 6px;
             font-size: 0.65rem;
             font-weight: bold;
             border-radius: 4px;
+            z-index: 2;
             border: 1px solid #00f2fe30;
         }
 
@@ -222,14 +240,13 @@
             .logo-img { max-width: 90px; }
             .nav-menu { gap: 8px; }
             .nav-link { font-size: 0.75rem; }
-            .posters-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-            .movie-card img { height: 145px; }
+            .posters-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
+            .movie-card .poster-box { height: 155px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- البار العلوي المصلح أبعاده للجوال -->
     <nav class="navbar">
         <div class="nav-right">
             <img src="logo.png" alt="SHASHAFLIX" class="logo-img" onclick="showCategory('all')">
@@ -243,17 +260,17 @@
     </nav>
 
     <div class="hero-banner">
-        <div class="hero-title">ONE PIECE</div>
-        <div style="max-width: 450px; font-size: 0.85rem; color: #e5e5e5;">تابع مغامرات مونكي دي لوفي في سعيه ليكون ملك القراصنة. اضغط على أي عمل بالأسفل لتشغيل الحلقات والسيرفرات الحية فوراً ومجاناً.</div>
+        <div class="hero-title">SHASHAFLIX PREMIUM</div>
+        <div style="max-width: 450px; font-size: 0.85rem; color: #e5e5e5;">مكتبة فلكس الكبرى المحدثة لأشهر وأحدث العروض السينمائية والأنمي المترجم. اختر رغبتك الآن لبدء البث التلقائي.</div>
     </div>
 
-    <!-- صندوق البحث الفوري الداخلي المضمون -->
+    <!-- صندوق البحث الفوري -->
     <div class="search-wrapper">
-        <input type="text" id="searchInput" class="search-input" oninput="liveSearch()" placeholder="ابحث عن العروض (مثال: One Piece, Wednesday)...">
+        <input type="text" id="searchInput" class="search-input" oninput="liveSearch()" placeholder="ابحث في قائمة فلكس الكبرى الحالية...">
         <button class="search-btn" onclick="liveSearch()">بحث</button>
     </div>
 
-    <!-- المشغل الذكي ومحدد الحلقات -->
+    <!-- المشغل ومحدد الحلقات -->
     <div class="player-section" id="playerSection">
         <div class="video-container">
             <iframe id="mainIframe" src="" allowfullscreen></iframe>
@@ -265,11 +282,10 @@
                 <label style="margin-right:15px;">الحلقة:</label>
                 <select id="episodeSelect" onchange="loadEpisode()"></select>
             </div>
-            <div style="font-size:0.8rem; color:#00f2fe;">💡 الترجمة العربية مدمجة تلقائياً داخل المشغل (اضغط على CC أو زر الترجمة).</div>
+            <div style="font-size:0.8rem; color:#00f2fe;">💡 الترجمة: اضغط على خيار الترجمة (CC) داخل مشغل الفيديو لتفعيل العربية.</div>
         </div>
     </div>
 
-    <!-- منطقة عرض العروض والأقسام -->
     <div class="main-container">
         <div class="section-row">
             <div class="row-title" id="sectionTitle">أحدث وأقوى المسلسلات والأفلام المضافة حالياً</div>
@@ -278,35 +294,36 @@
     </div>
 
     <script>
-        // قاعدة بيانات ضخمة ومدمجة مباشرة لضمان العمل على Vercel بدون أخطاء اتصال نهائياً
+        // داتابيز موسعة ومحدثة لأشهر أعمال 2026 والأنميات الكبرى بروابط صور مستقرة ومؤمنة
         const database = [
-            // قسم الأنمي
-            { id: "21", type: "tv", title: "One Piece", img: "https://image.tmdb.org/t/p/w500/v9nG0v8aG2Eg8v86I3ubsiZa6vK.jpg", badge: "أنمي", seasons: 1, episodesPerSeason: 1100 },
-            { id: "31911", type: "tv", title: "Fullmetal Alchemist: Brotherhood", img: "https://image.tmdb.org/t/p/w500/5Zg60m0g2v7sv6jR9Uf3dDlxZpZ.jpg", badge: "أنمي", seasons: 1, episodesPerSeason: 64 },
-            { id: "94605", type: "tv", title: "Demon Slayer (Kimetsu no Yaiba)", img: "https://image.tmdb.org/t/p/w500/3w8S57v3gYMaYfdfFt76Qv5QwbX.jpg", badge: "أنمي", seasons: 4, episodesPerSeason: 11 },
-            { id: "1429", type: "tv", title: "Attack on Titan", img: "https://image.tmdb.org/t/p/w500/h6dt7w4gMaMa7gXW5Qv5QwbX.jpg", badge: "أنمي", seasons: 4, episodesPerSeason: 25 },
-            { id: "209867", type: "tv", title: "Frieren: Beyond Journey's End", img: "https://image.tmdb.org/t/p/w500/or066gT60Bw7u6vYg90uCj7gK96.jpg", badge: "أنمي", seasons: 1, episodesPerSeason: 28 },
-            
-            // قسم المسلسلات العالمية
-            { id: "110316", type: "tv", title: "Wednesday", img: "https://image.tmdb.org/t/p/w500/9PFonBhy46wcEpb62Y2u6Glm36G.jpg", badge: "مسلسل", seasons: 1, episodesPerSeason: 8 },
-            { id: "1396", type: "tv", title: "Breaking Bad", img: "https://image.tmdb.org/t/p/w500/ztkUQv6v1NZv6J6wSu99Zg68uGE.jpg", badge: "مسلسل", seasons: 5, episodesPerSeason: 13 },
-            { id: "66732", type: "tv", title: "Stranger Things", img: "https://image.tmdb.org/t/p/w500/49w0wGv7gMa7gXW5Qv5QwbX.jpg", badge: "مسلسل", seasons: 4, episodesPerSeason: 9 },
-            { id: "82856", type: "tv", title: "The Mandalorian", img: "https://image.tmdb.org/t/p/w500/e9t0wGv7gMa7gXW5Qv5QwbX.jpg", badge: "مسلسل", seasons: 3, episodesPerSeason: 8 },
-            { id: "71446", type: "tv", title: "Money Heist (La Casa de Papel)", img: "https://image.tmdb.org/t/p/w500/reKs8aa99Zg68uGE49w0wGv7gMa.jpg", badge: "مسلسل", seasons: 5, episodesPerSeason: 10 },
+            // قسم الأنميات الرائجة جداً
+            { id: "21", type: "tv", title: "One Piece", img: "https://images.justwatch.com/poster/305510006/s332/one-piece.webp", badge: "أنمي", seasons: 1, episodesPerSeason: 1100 },
+            { id: "1429", type: "tv", title: "Attack on Titan", img: "https://images.justwatch.com/poster/305545283/s332/attack-on-titan.webp", badge: "أنمي", seasons: 4, episodesPerSeason: 25 },
+            { id: "94605", type: "tv", title: "Demon Slayer", img: "https://images.justwatch.com/poster/300539121/s332/demon-slayer-kimetsu-no-yaiba.webp", badge: "أنمي", seasons: 4, episodesPerSeason: 11 },
+            { id: "114410", type: "tv", title: "Chainsaw Man", img: "https://images.justwatch.com/poster/300587632/s332/chainsaw-man.webp", badge: "أنمي", seasons: 1, episodesPerSeason: 12 },
+            { id: "95479", type: "tv", title: "Jujutsu Kaisen", img: "https://images.justwatch.com/poster/263725911/s332/jujutsu-kaisen.webp", badge: "أنمي", seasons: 2, episodesPerSeason: 23 },
+            { id: "31911", type: "tv", title: "Fullmetal Alchemist", img: "https://images.justwatch.com/poster/8733221/s332/fullmetal-alchemist-brotherhood.webp", badge: "أنمي", seasons: 1, episodesPerSeason: 64 },
 
-            // قسم الأفلام السينمائية
-            { id: "299534", type: "movie", title: "Avengers: Endgame", img: "https://image.tmdb.org/t/p/w500/or066gT60Bw7u6vYg90uCj7gK96.jpg", badge: "فيلم" },
-            { id: "157336", type: "movie", title: "Interstellar", img: "https://image.tmdb.org/t/p/w500/gEU2vW9Z7786v3t2gGwYZvV6jR9.jpg", badge: "فيلم" },
-            { id: "19995", type: "movie", title: "Avatar", img: "https://image.tmdb.org/t/p/w500/kyeqW6vX4w8uW6fjoH6dJhuxv6d.jpg", badge: "فيلم" },
-            { id: "515001", type: "movie", title: "Jojo Rabbit", img: "https://image.tmdb.org/t/p/w500/7Gs7vgt6wZ9878gGwW4uXmYw4pX.jpg", badge: "فيلم" },
-            { id: "475557", type: "movie", title: "Joker", img: "https://image.tmdb.org/t/p/w500/udDcl7n4v9v3bZ9Uf3dDlxZpZ.jpg", badge: "فيلم" },
-            { id: "27205", type: "movie", title: "Inception", img: "https://image.tmdb.org/t/p/w500/edv5CZvYg90uCj7gK96vW9Z77.jpg", badge: "فيلم" }
+            // قسم المسلسلات الأكثر شهرة وطلباً
+            { id: "110316", type: "tv", title: "Wednesday", img: "https://images.justwatch.com/poster/301540302/s332/wednesday.webp", badge: "مسلسل", seasons: 1, episodesPerSeason: 8 },
+            { id: "1396", type: "tv", title: "Breaking Bad", img: "https://images.justwatch.com/poster/301540321/s332/breaking-bad.webp", badge: "مسلسل", seasons: 5, episodesPerSeason: 13 },
+            { id: "66732", type: "tv", title: "Stranger Things", img: "https://images.justwatch.com/poster/285514032/s332/stranger-things.webp", badge: "مسلسل", seasons: 4, episodesPerSeason: 9 },
+            { id: "12526", type: "tv", title: "Malcolm in the Middle", img: "https://images.justwatch.com/poster/259020911/s332/malcolm-in-the-middle.webp", badge: "مسلسل", seasons: 7, episodesPerSeason: 22 },
+            { id: "71446", type: "tv", title: "Money Heist", img: "https://images.justwatch.com/poster/251349032/s332/la-casa-de-papel.webp", badge: "مسلسل", seasons: 5, episodesPerSeason: 10 },
+            { id: "1399", type: "tv", title: "Game of Thrones", img: "https://images.justwatch.com/poster/259132044/s332/game-of-thrones.webp", badge: "مسلسل", seasons: 8, episodesPerSeason: 10 },
+
+            // قسم أحدث وأشهر الأفلام
+            { id: "299534", type: "movie", title: "Avengers: Endgame", img: "https://images.justwatch.com/poster/128181321/s332/avengers-endgame.webp", badge: "فيلم" },
+            { id: "157336", type: "movie", title: "Interstellar", img: "https://images.justwatch.com/poster/41413921/s332/interstellar.webp", badge: "فيلم" },
+            { id: "19995", type: "movie", title: "Avatar", img: "https://images.justwatch.com/poster/302434011/s332/avatar-the-way-of-water.webp", badge: "فيلم" },
+            { id: "475557", type: "movie", title: "Joker", img: "https://images.justwatch.com/poster/148113011/s332/joker.webp", badge: "فيلم" },
+            { id: "27205", type: "movie", title: "Inception", img: "https://images.justwatch.com/poster/181130211/s332/inception.webp", badge: "فيلم" },
+            { id: "603", type: "movie", title: "The Matrix", img: "https://images.justwatch.com/poster/251020411/s332/the-matrix.webp", badge: "فيلم" }
         ];
 
         let currentCategory = "all";
         let currentShowData = null;
 
-        // تشغيل العرض عند فتح المنصة لأول مرة
         renderGrid(database);
 
         function renderGrid(data) {
@@ -321,7 +338,9 @@
                 card.className = 'movie-card';
                 card.innerHTML = `
                     <span class="card-badge">${item.badge}</span>
-                    <img src="${item.img}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/500x750?text=SHASHAFLIX'">
+                    <div class="poster-box">
+                        <img src="${item.img}" alt="${item.title}" loading="lazy">
+                    </div>
                     <div class="movie-card-title">${item.title}</div>
                 `;
                 card.onclick = () => startPlay(item);
@@ -329,7 +348,6 @@
             });
         }
 
-        // دالة الفلترة والتنقل بين الأقسام
         function showCategory(category) {
             currentCategory = category;
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
@@ -346,10 +364,9 @@
                 filtered = database.filter(item => item.badge === category);
             }
             renderGrid(filtered);
-            document.getElementById('searchInput').value = ""; // تنظيف البحث
+            document.getElementById('searchInput').value = "";
         }
 
-        // دالة البحث الفوري الداخلي المضمون
         function liveSearch() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             let baseItems = database;
@@ -362,7 +379,6 @@
             renderGrid(results);
         }
 
-        // تشغيل البث وإظهار المواسم والحلقات المضمونة بدون شاشة سوداء
         function startPlay(item) {
             const playerSection = document.getElementById('playerSection');
             const controlsBox = document.getElementById('controlsBox');
@@ -400,8 +416,6 @@
             const iframe = document.getElementById('mainIframe');
             const season = document.getElementById('seasonSelect').value;
             const episode = document.getElementById('episodeSelect').value;
-            
-            // ربط مباشر بالسيرفر العالمي المفتوح والمجاني عبر الـ ID الدقيق للحلقة
             iframe.src = `https://vidsrc.to/embed/tv/${currentShowData.id}/${season}/${episode}`;
         }
     </script>
