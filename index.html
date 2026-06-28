@@ -10,7 +10,397 @@
         * {
             box-sizing: border-box;
             margin: 0;
+            padding: 0;<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHASHAFLIX | محرك البث العام</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
             padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: #141414;
+            color: #ffffff;
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
+
+        /* شريط التنقل العلوي */
+        .navbar {
+            padding: 15px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo-img {
+            max-width: 110px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        .nav-title-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #00f2fe;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+
+        /* البانر الرئيسي السينمائي */
+        .hero-banner {
+            width: 100%;
+            height: 35vh;
+            background: linear-gradient(to top, #141414 8%, rgba(20,20,20,0.2) 50%, rgba(0,0,0,0.7) 100%), 
+                        url('https://image.tmdb.org/t/p/original/69w831Z6MdnG346wYw66A7v7g2z.jpg') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 4% 20px 4%;
+            margin-top: 60px;
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+            color: #00f2fe;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.9);
+        }
+
+        /* صندوق البحث العام والمفتوح */
+        .search-wrapper {
+            width: 92%;
+            max-width: 550px;
+            margin: 25px auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 25px;
+            border: 2px solid #282828;
+            background-color: #181818;
+            color: #fff;
+            outline: none;
+            font-size: 0.95rem;
+            text-align: right;
+        }
+
+        .search-input:focus { border-color: #00f2fe; }
+
+        .search-btn {
+            padding: 0 25px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: #0c0f12;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        /* قسم المشغل الذكي ومحدد الحلقات */
+        .player-section {
+            display: none;
+            width: 92%;
+            max-width: 900px;
+            margin: 0 auto 30px auto;
+            background-color: #181818;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #282828;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background-color: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; border: none;
+        }
+
+        .episodes-controls {
+            padding: 15px 20px;
+            background-color: #181818;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-top: 1px solid #282828;
+        }
+
+        .selector-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select {
+            background-color: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* المحتوى والبطاقات التلقائية */
+        .main-container { padding: 0 4%; }
+        .section-row { margin-bottom: 30px; }
+        .row-title { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 15px; border-right: 3px solid #00f2fe; padding-right: 8px; }
+        
+        .posters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 18px;
+        }
+
+        .movie-card {
+            background: linear-gradient(135deg, #1e2630 0%, #11151d 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            border: 1px solid #2d3748;
+            display: flex;
+            flex-direction: column;
+            height: 220px;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        /* أيقونة سينمائية داخل الكرت بدلاً من الصور الخارجية التي تحجب */
+        .card-icon {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #00f2fe;
+            opacity: 0.7;
+            background: radial-gradient(circle, rgba(0,242,254,0.05) 0%, rgba(0,0,0,0) 70%);
+        }
+
+        .movie-card-title {
+            padding: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+            background-color: #0c0f12;
+            font-weight: 600;
+            border-top: 1px solid #2d3748;
+            color: #e2e8f0;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: #7f00ff;
+            color: #fff;
+            padding: 2px 7px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .logo-img { max-width: 90px; }
+            .posters-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+            .movie-card { height: 170px; }
+            .card-icon { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-right">
+            <img src="logo.png" alt="SHASHAFLIX" class="logo-img" onclick="window.location.reload()">
+            <span class="nav-title-text">SHASHAFLIX GENERAL</span>
+        </div>
+    </nav>
+
+    <div class="hero-banner">
+        <div class="hero-title">محرك البحث الشامل</div>
+        <div style="max-width: 450px; font-size: 0.85rem; color: #e5e5e5;">مثل فكرة باوع تماماً؛ وسيط خارجي مفتوح يبحث لك في كامل الإنترنت ويولد روابط البث لجميع الأفلام والأنميات فوراً وبدون حدود.</div>
+    </div>
+
+    <!-- صندوق البحث المفتوح للملايين -->
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم أي فيلم أو أنمي بالإنجليزية (مثل: One Piece)...">
+        <button class="search-btn" onclick="generateSearchCard()">ابحث في فلكس</button>
+    </div>
+
+    <!-- المشغل ومحدد الحلقات والمواسم التلقائي المصلح -->
+    <div class="player-section" id="playerSection">
+        <div class="video-container">
+            <iframe id="mainIframe" src="" allowfullscreen></iframe>
+        </div>
+        <div class="episodes-controls" id="controlsBox">
+            <div class="selector-group">
+                <label id="seasonLabel">الموسم:</label>
+                <select id="seasonSelect" onchange="changeSeason()"></select>
+                <label id="episodeLabel" style="margin-right: 15px;">الحلقة:</label>
+                <select id="episodeSelect" onchange="loadEpisode()"></select>
+            </div>
+            <div style="font-size:0.8rem; color:#00f2fe;">💡 الترجمة: اضغط على خيار الترجمة (CC) داخل مشغل الفيديو لتفعيل اللغة العربية.</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="section-row">
+            <div class="row-title" id="sectionTitle">نتائج محرك البحث الفوري</div>
+            <div class="posters-grid" id="mainGrid">
+                <!-- هنا ستظهر بطاقات البحث المقترحة تلقائياً عند الدخول -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // داتا ذكية لعرض مقترحات سريعة بمجرد فتح المنصة
+        const defaultSuggestions = [
+            { title: "One Piece", type: "tv" },
+            { title: "Attack on Titan", type: "tv" },
+            { title: "Wednesday", type: "tv" },
+            { title: "Breaking Bad", type: "tv" },
+            { title: "Avatar", type: "movie" },
+            { title: "Interstellar", type: "movie" },
+            { title: "Joker", type: "movie" }
+        ];
+
+        // تشغيل المقترحات تلقائياً عند فتح الصفحة
+        window.onload = function() {
+            displayResults(defaultSuggestions);
+        };
+
+        // دالة توليد بطاقات البحث بناء على ما يكتبه المستخدم (عامة ومفتوحة لأي اسم!)
+        function generateSearchCard() {
+            const query = document.getElementById('searchInput').value.trim();
+            if(!query) return alert("الرجاء كتابة اسم العمل أولاً!");
+
+            // نظام الفلترة الذكي لحماية الشاشة من مقاطع الرياضيات
+            const blacklist = ['شرح', 'رياضيات', 'درس', 'استاذ', 'محاضرة'];
+            if (blacklist.some(word => query.includes(word))) {
+                alert('⚠️ نعتذر، هذا المحتوى خارج نطاق المواد الترفيهية لـ SHASHAFLIX.');
+                return;
+            }
+
+            // توليد خيارين تلقائياً للمستخدم (خيار كـ مسلسل/أنمي وخيار كـ فيلم) لكي يبحث في السيرفرات بكل حرية!
+            const customResults = [
+                { title: query, type: "tv" },
+                { title: query, type: "movie" }
+            ];
+
+            displayResults(customResults);
+            document.getElementById('sectionTitle').textContent = `نتائج البحث ومسارات البث لـ: ${query}`;
+        }
+
+        // دالة رسم كروت العرض ذكياً بدون الحاجة لروابط صور خارجية قابلة للحجب
+        function displayResults(items) {
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = "";
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                
+                // تحديد شكل الأيقونة والبادج بناء على نوع العمل
+                const badgeText = item.type === 'tv' ? 'أنمي / مسلسل' : 'فيلم سينمائي';
+                const iconShape = item.type === 'tv' ? '📺' : '🎬';
+
+                card.innerHTML = `
+                    <span class="card-badge">${badgeText}</span>
+                    <div class="card-icon">${iconShape}</div>
+                    <div class="movie-card-title">${item.title}</div>
+                `;
+                
+                card.onclick = () => startGeneralPlay(item.title, item.type);
+                grid.appendChild(card);
+            });
+        }
+
+        let currentTitle = "";
+        let currentType = "";
+
+        // دالة تشغيل البث العام والمفتوح
+        function startGeneralPlay(title, type) {
+            const playerSection = document.getElementById('playerSection');
+            const controlsBox = document.getElementById('controlsBox');
+            
+            currentTitle = encodeURIComponent(title.toLowerCase());
+            currentType = type;
+
+            playerSection.style.display = 'block';
+            window.scrollTo({ top: playerSection.offsetTop - 90, behavior: 'smooth' });
+
+            if (type === 'movie') {
+                // للأفلام: تشغيل فوري ومباشر بالاسم عبر مسار البحث المفتوح
+                controlsBox.style.display = 'none';
+                const iframe = document.getElementById('mainIframe');
+                iframe.src = `https://vidsrc.me/embed/movie?title=${currentTitle}`;
+            } else {
+                // للمسلسلات والأنمي: توليد قوائم مواسم وحلقات تلقائية ومفتوحة (إلى 4 مواسم و 100 حلقة احتياطياً لأي مسلسل!)
+                controlsBox.style.display = 'flex';
+                
+                const seasonSelect = document.getElementById('seasonSelect');
+                seasonSelect.innerHTML = "";
+                for(let i=1; i<=10; i++) { // يولد حتى 10 مواسم تلقائياً لأي مسلسل يختاره المستخدم
+                    seasonSelect.innerHTML += `<option value="${i}">الموسم ${i}</option>`;
+                }
+                
+                changeSeason();
+            }
+        }
+
+        // توليد الحلقات تلقائياً (حتى 100 حلقة مفتوحة لكل موسم لضمان تشغيل الأنميات الطويلة)
+        function changeSeason() {
+            const episodeSelect = document.getElementById('episodeSelect');
+            episodeSelect.innerHTML = "";
+            for (let i = 1; i <= 100; i++) {
+                episodeSelect.innerHTML += `<option value="${i}">الحلقة ${i}</option>`;
+            }
+            loadEpisode();
+        }
+
+        // توجيه الرابط النهائي والمفتوح للمشغل
+        function loadEpisode() {
+            const iframe = document.getElementById('mainIframe');
+            const season = document.getElementById('seasonSelect').value;
+            const episode = document.getElementById('episodeSelect').value;
+            
+            // الرابط الذكي والمفتوح لجلب أي مسلسل أو أنمي بالاسم ورقم الحلقة مباشرة
+            iframe.src = `https://vidsrc.me/embed/tv?title=${currentTitle}&sea=${season}&epi=${episode}`;
+        }
+    </script>
+</body>
+</html>
             font-family: 'Cairo', sans-serif;
         }
 
